@@ -1,0 +1,38 @@
+﻿machine rtx4060, constants model\constants_rtx5060.cal, shapes: heldout
+
+lossless only (f16)
+  shapes 3, rows 1024
+  MAPE            32.221 %
+  Spearman rho    0.389
+  Kendall tau     0.259
+  regret mean     3.693 %
+  regret max      6.272 %
+  top-1 hit       0.000 %
+  H32_Hkv32_d128_n4096_b1  rows=192  rho=-0.0165687  tau=-0.0292272  regret=3.04054%  chosen=f16 | head_major/contiguous | splits=32 w8 u4 (312.32 us vs best 303.104 us)
+  H32_Hkv8_d128_n4096_b8  rows=384  rho=0.466964  tau=0.29905  regret=6.2724%  chosen=f16 | head_major/contiguous | splits=32 pack w8 u2 (607.232 us vs best 571.392 us)
+  H32_Hkv8_d64_n16384_b1  rows=448  rho=0.716836  tau=0.507391  regret=1.76471%  chosen=f16 | head_major/contiguous | splits=2 pack w8 u4 (177.152 us vs best 174.08 us)
+
+accuracy limit 0.02 (f16 + int8)
+  shapes 3, rows 2624
+  MAPE            26.167 %
+  Spearman rho    0.792
+  Kendall tau     0.592
+  regret mean     11.972 %
+  regret max      19.745 %
+  top-1 hit       0.000 %
+  H32_Hkv32_d128_n4096_b1  rows=576  rho=0.790683  tau=0.592365  regret=5.26316%  chosen=int8:128 | head_major/contiguous | splits=32 w8 u4 (184.32 us vs best 175.104 us)
+  H32_Hkv8_d128_n4096_b8  rows=1152  rho=0.783174  tau=0.573193  regret=19.7452%  chosen=int8:128 | head_major/contiguous | splits=8 pack w8 u2 (385.024 us vs best 321.536 us)
+  H32_Hkv8_d64_n16384_b1  rows=896  rho=0.801539  tau=0.610894  regret=10.9091%  chosen=int8:64 | head_major/contiguous | splits=64 pack w8 u2 (124.928 us vs best 112.64 us)
+
+no accuracy limit (f16 + int8 + int4)
+  shapes 3, rows 5248
+  MAPE            21.465 %
+  Spearman rho    0.887
+  Kendall tau     0.716
+  regret mean     12.475 %
+  regret max      21.296 %
+  top-1 hit       0.000 %
+  H32_Hkv32_d128_n4096_b1  rows=1152  rho=0.916745  tau=0.749894  regret=21.2963%  chosen=int4:128 | head_major/contiguous | splits=32 w8 u4 (134.144 us vs best 110.592 us)
+  H32_Hkv8_d128_n4096_b8  rows=2304  rho=0.861353  tau=0.681402  regret=9.95671%  chosen=int4:128 | head_major/contiguous | splits=8 pack w8 u4 (260.096 us vs best 236.544 us)
+  H32_Hkv8_d64_n16384_b1  rows=1792  rho=0.881714  tau=0.715512  regret=6.17284%  chosen=int4:64 | head_major/contiguous | splits=16 pack w8 u4 (88.064 us vs best 82.944 us)
+

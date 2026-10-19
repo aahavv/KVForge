@@ -1,0 +1,19 @@
+# build outputs (regenerate with cmake / tools\build_cuda.ps1)
+build/
+*.exe
+*.obj
+*.cubin
+*.pdb
+*.ilk
+*.lib
+*.exp
+# the RTX 4060 package (regenerate with tools\make_friend_package.ps1)
+dist/
+# compiler runs (regenerate with kvf plan / demo scripts)
+out/
+# misc
+*.log
+*.bak
+__pycache__/
+node_modules/
+.vs/

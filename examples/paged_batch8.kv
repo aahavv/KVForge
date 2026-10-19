@@ -1,0 +1,13 @@
+# A served workload: eight sequences decoded together out of a paged cache, the
+# shape a vLLM-style block allocator produces. The format is pinned to fp16 and
+# only the layout and partition are searched. Splits are pinned to 4 while
+# gqa_pack stays free: the old CPU prototype silently ignored the pinned splits
+# in this case.
+target machine = "machines/generic-gpu.gpu"
+
+decode served_gqa(H: 32, H_kv: 8, d: 128, n: 8192, batch: 8) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, f16, ?, ?>
+  V: kvcache<n, d, f16, ?, ?>
+  O = decode_attn(Q, K, V, scale = auto, splits = 4, gqa_pack = ?)
+}

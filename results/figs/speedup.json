@@ -1,0 +1,262 @@
+{
+  "H16_Hkv16_d64_n8192_b2": {
+    "lossless (f16)": {
+      "baseline_us": 249.056,
+      "chosen_us": 228.992,
+      "oracle_us": 201.696,
+      "speedup_vs_baseline": 1.0876187814421465,
+      "regret": 0.1353323814056797,
+      "plan": "f16 head_major/contiguous:0 splits=4 pack=0 w4 u2"
+    },
+    "int8 allowed (err<=0.02)": {
+      "baseline_us": 249.056,
+      "chosen_us": 129.888,
+      "oracle_us": 117.376,
+      "speedup_vs_baseline": 1.9174673564917468,
+      "regret": 0.1065976008724101,
+      "plan": "int8:64 head_major/contiguous:0 splits=4 pack=0 w4 u2"
+    },
+    "all formats": {
+      "baseline_us": 249.056,
+      "chosen_us": 97.408,
+      "oracle_us": 74.016,
+      "speedup_vs_baseline": 2.556833114323259,
+      "regret": 0.31603977518374404,
+      "plan": "int4:64 head_major/contiguous:0 splits=4 pack=0 w8 u2"
+    }
+  },
+  "H32_Hkv32_d128_n16384_b1": {
+    "lossless (f16)": {
+      "baseline_us": 909.12,
+      "chosen_us": 826.24,
+      "oracle_us": 768.448,
+      "speedup_vs_baseline": 1.100309837335399,
+      "regret": 0.0752061297576414,
+      "plan": "f16 head_major/contiguous:0 splits=4 pack=0 w4 u2"
+    },
+    "int8 allowed (err<=0.02)": {
+      "baseline_us": 909.12,
+      "chosen_us": 440.768,
+      "oracle_us": 412.256,
+      "speedup_vs_baseline": 2.0625816756207347,
+      "regret": 0.06916090972599553,
+      "plan": "int8:128 head_major/contiguous:0 splits=4 pack=0 w8 u2"
+    },
+    "all formats": {
+      "baseline_us": 909.12,
+      "chosen_us": 299.872,
+      "oracle_us": 243.968,
+      "speedup_vs_baseline": 3.0316935225696295,
+      "regret": 0.2291448058761807,
+      "plan": "int4:128 head_major/contiguous:0 splits=4 pack=0 w8 u2"
+    }
+  },
+  "H32_Hkv32_d128_n4096_b1": {
+    "lossless (f16)": {
+      "baseline_us": 260.768,
+      "chosen_us": 228.352,
+      "oracle_us": 203.52,
+      "speedup_vs_baseline": 1.1419562780269057,
+      "regret": 0.12201257861635217,
+      "plan": "f16 head_major/contiguous:0 splits=4 pack=0 w4 u2"
+    },
+    "int8 allowed (err<=0.02)": {
+      "baseline_us": 260.768,
+      "chosen_us": 130.464,
+      "oracle_us": 113.184,
+      "speedup_vs_baseline": 1.998773608045131,
+      "regret": 0.15267175572519087,
+      "plan": "int8:128 head_major/contiguous:0 splits=4 pack=0 w4 u2"
+    },
+    "all formats": {
+      "baseline_us": 260.768,
+      "chosen_us": 95.392,
+      "oracle_us": 72.128,
+      "speedup_vs_baseline": 2.7336464273733645,
+      "regret": 0.3225377107364684,
+      "plan": "int4:128 head_major/contiguous:0 splits=4 pack=0 w8 u2"
+    }
+  },
+  "H32_Hkv8_d128_n16384_b4": {
+    "lossless (f16)": {
+      "baseline_us": 975.296,
+      "chosen_us": 776.512,
+      "oracle_us": 772.448,
+      "speedup_vs_baseline": 1.2559960438473585,
+      "regret": 0.005261195575624544,
+      "plan": "f16 head_major/contiguous:0 splits=8 pack=1 w8 u2"
+    },
+    "int8 allowed (err<=0.02)": {
+      "baseline_us": 975.296,
+      "chosen_us": 555.424,
+      "oracle_us": 490.08,
+      "speedup_vs_baseline": 1.7559486086305238,
+      "regret": 0.1333333333333333,
+      "plan": "int8:128 head_major/contiguous:0 splits=8 pack=1 w8 u4"
+    },
+    "all formats": {
+      "baseline_us": 975.296,
+      "chosen_us": 438.816,
+      "oracle_us": 432.384,
+      "speedup_vs_baseline": 2.2225625319040327,
+      "regret": 0.014875666074600336,
+      "plan": "int4:128 head_major/contiguous:0 splits=8 pack=1 w8 u4"
+    }
+  },
+  "H32_Hkv8_d128_n32768_b1": {
+    "lossless (f16)": {
+      "baseline_us": 1560.19,
+      "chosen_us": 516.352,
+      "oracle_us": 396.608,
+      "speedup_vs_baseline": 3.021562809866138,
+      "regret": 0.301920284008391,
+      "plan": "f16 head_major/contiguous:0 splits=32 pack=1 w8 u2"
+    },
+    "int8 allowed (err<=0.02)": {
+      "baseline_us": 1560.19,
+      "chosen_us": 269.792,
+      "oracle_us": 261.504,
+      "speedup_vs_baseline": 5.7829364844028,
+      "regret": 0.031693587860988526,
+      "plan": "int8:128 head_major/contiguous:0 splits=32 pack=1 w8 u4"
+    },
+    "all formats": {
+      "baseline_us": 1560.19,
+      "chosen_us": 232.288,
+      "oracle_us": 230.496,
+      "speedup_vs_baseline": 6.716619024659044,
+      "regret": 0.007774538386783325,
+      "plan": "int4:128 head_major/contiguous:0 splits=32 pack=1 w8 u4"
+    }
+  },
+  "H32_Hkv8_d128_n4096_b8": {
+    "lossless (f16)": {
+      "baseline_us": 503.648,
+      "chosen_us": 513.152,
+      "oracle_us": 402.048,
+      "speedup_vs_baseline": 0.9814791718633076,
+      "regret": 0.2763451130213308,
+      "plan": "f16 head_major/contiguous:0 splits=4 pack=1 w8 u2"
+    },
+    "int8 allowed (err<=0.02)": {
+      "baseline_us": 503.648,
+      "chosen_us": 268.864,
+      "oracle_us": 260.512,
+      "speedup_vs_baseline": 1.873244465603428,
+      "regret": 0.032059943495885035,
+      "plan": "int8:128 head_major/contiguous:0 splits=4 pack=1 w8 u4"
+    },
+    "all formats": {
+      "baseline_us": 503.648,
+      "chosen_us": 232.192,
+      "oracle_us": 227.712,
+      "speedup_vs_baseline": 2.169101433296582,
+      "regret": 0.01967397414277694,
+      "plan": "int4:128 head_major/contiguous:0 splits=4 pack=1 w8 u4"
+    }
+  },
+  "H32_Hkv8_d128_n65536_b1": {
+    "lossless (f16)": {
+      "baseline_us": 3073.34,
+      "chosen_us": 828.224,
+      "oracle_us": 770.784,
+      "speedup_vs_baseline": 3.7107594080828377,
+      "regret": 0.07452152613442942,
+      "plan": "f16 head_major/contiguous:0 splits=32 pack=1 w8 u2"
+    },
+    "int8 allowed (err<=0.02)": {
+      "baseline_us": 3073.34,
+      "chosen_us": 496.288,
+      "oracle_us": 496.128,
+      "speedup_vs_baseline": 6.19265426526533,
+      "regret": 0.00032249742002066206,
+      "plan": "int8:128 head_major/contiguous:0 splits=32 pack=1 w8 u4"
+    },
+    "all formats": {
+      "baseline_us": 3073.34,
+      "chosen_us": 437.312,
+      "oracle_us": 427.328,
+      "speedup_vs_baseline": 7.027797087662813,
+      "regret": 0.023363786131496367,
+      "plan": "int4:128 head_major/contiguous:0 splits=32 pack=1 w8 u4"
+    }
+  },
+  "H32_Hkv8_d128_n8192_b1": {
+    "lossless (f16)": {
+      "baseline_us": 412.224,
+      "chosen_us": 115.872,
+      "oracle_us": 111.296,
+      "speedup_vs_baseline": 3.5575807787903893,
+      "regret": 0.0411155836687751,
+      "plan": "f16 head_major/contiguous:0 splits=32 pack=1 w8 u2"
+    },
+    "int8 allowed (err<=0.02)": {
+      "baseline_us": 412.224,
+      "chosen_us": 90.72,
+      "oracle_us": 90.656,
+      "speedup_vs_baseline": 4.5439153439153435,
+      "regret": 0.0007059654076948529,
+      "plan": "int8:128 head_major/contiguous:0 splits=32 pack=1 w8 u4"
+    },
+    "all formats": {
+      "baseline_us": 412.224,
+      "chosen_us": 78.496,
+      "oracle_us": 75.168,
+      "speedup_vs_baseline": 5.251528740317978,
+      "regret": 0.04427415921668776,
+      "plan": "int4:128 head_major/contiguous:0 splits=32 pack=1 w8 u4"
+    }
+  },
+  "H32_Hkv8_d64_n16384_b1": {
+    "lossless (f16)": {
+      "baseline_us": 422.72,
+      "chosen_us": 121.312,
+      "oracle_us": 111.2,
+      "speedup_vs_baseline": 3.4845687153785283,
+      "regret": 0.0909352517985611,
+      "plan": "f16 head_major/contiguous:0 splits=32 pack=1 w8 u2"
+    },
+    "int8 allowed (err<=0.02)": {
+      "baseline_us": 422.72,
+      "chosen_us": 91.36,
+      "oracle_us": 90.592,
+      "speedup_vs_baseline": 4.626970227670753,
+      "regret": 0.00847756976333458,
+      "plan": "int8:64 head_major/contiguous:0 splits=32 pack=1 w8 u4"
+    },
+    "all formats": {
+      "baseline_us": 422.72,
+      "chosen_us": 80.512,
+      "oracle_us": 74.848,
+      "speedup_vs_baseline": 5.25039745627981,
+      "regret": 0.07567336468576324,
+      "plan": "int4:64 head_major/contiguous:0 splits=32 pack=1 w8 u4"
+    }
+  },
+  "H64_Hkv8_d128_n8192_b1": {
+    "lossless (f16)": {
+      "baseline_us": 445.728,
+      "chosen_us": 145.856,
+      "oracle_us": 143.808,
+      "speedup_vs_baseline": 3.055945590171128,
+      "regret": 0.014241210502892843,
+      "plan": "f16 head_major/contiguous:0 splits=16 pack=1 w8 u4"
+    },
+    "int8 allowed (err<=0.02)": {
+      "baseline_us": 445.728,
+      "chosen_us": 145.856,
+      "oracle_us": 139.744,
+      "speedup_vs_baseline": 3.055945590171128,
+      "regret": 0.04373711930386981,
+      "plan": "f16 head_major/contiguous:0 splits=16 pack=1 w8 u4"
+    },
+    "all formats": {
+      "baseline_us": 445.728,
+      "chosen_us": 145.856,
+      "oracle_us": 136.512,
+      "speedup_vs_baseline": 3.055945590171128,
+      "regret": 0.06844819503047339,
+      "plan": "f16 head_major/contiguous:0 splits=16 pack=1 w8 u4"
+    }
+  }
+}

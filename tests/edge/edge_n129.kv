@@ -1,0 +1,10 @@
+# Edge shape for correctness testing: one token past a page boundary
+target machine = "machines/rtx5060-laptop.gpu"
+target include_quantized = 1
+
+decode edge_n129(H: 32, H_kv: 8, d: 128, n: 129, batch: 1) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, ?, ?, ?>
+  V: kvcache<n, d, ?, ?, ?>
+  O = decode_attn(Q, K, V, scale = auto, splits = ?, gqa_pack = ?)
+}

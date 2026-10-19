@@ -1,0 +1,11 @@
+# Step 3: same program plus an accuracy budget of 2% relative error.
+# The budget is what lets the compiler consider int8 / int4 caches; the
+# accuracy gate rejects any format whose calibrated error is above it.
+target max_rel_err = 0.02
+
+decode budget(H: 32, H_kv: 8, d: 128, n: 32768, batch: 1) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, ?, ?, ?>
+  V: kvcache<n, d, ?, ?, ?>
+  O = decode_attn(Q, K, V, scale = auto, splits = ?, gqa_pack = ?)
+}

@@ -1,0 +1,17 @@
+# KVForge cost-model constants. Fitted once on one GPU, then frozen.
+r0_bytes = 2
+c_page_ns = 22.160834
+unpack_l2_hit = 0.73859375
+issue_eff = 0.43071552
+meta_waste = 0
+overlap_p = 4.2209307
+launch_frac = 0.88007812
+merge_frac = 0.10645313
+lat_scale = 8.437056
+warp_w0 = 2.1717134
+wave_model = 0
+rel_err.int4_128 = 0.143969
+rel_err.int4_32 = 0.113567
+rel_err.int4_64 = 0.129286
+rel_err.int8_128 = 0.00838787
+rel_err.int8_64 = 0.00753481

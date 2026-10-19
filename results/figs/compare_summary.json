@@ -1,0 +1,96 @@
+{
+  "per_shape": {
+    "H16_Hkv16_d64_n8192_b2": {
+      "flashinfer_us": 199.2,
+      "kvforge_pick_us": 222.11,
+      "kvforge_oracle_us": 219.65,
+      "sdpa_us": 197.28,
+      "kvforge_baseline_us": 256.86
+    },
+    "H32_Hkv32_d128_n16384_b1": {
+      "flashinfer_us": 825.18,
+      "kvforge_pick_us": 776.96,
+      "kvforge_oracle_us": 770.46,
+      "sdpa_us": 829.47,
+      "kvforge_baseline_us": 893.73
+    },
+    "H32_Hkv32_d128_n4096_b1": {
+      "flashinfer_us": 200.8,
+      "kvforge_pick_us": 222.11,
+      "kvforge_oracle_us": 209.54,
+      "sdpa_us": 213.7,
+      "kvforge_baseline_us": 263.87
+    },
+    "H32_Hkv8_d128_n16384_b4": {
+      "flashinfer_us": 774.56,
+      "kvforge_pick_us": 777.47,
+      "kvforge_oracle_us": 773.12,
+      "sdpa_us": 782.82,
+      "kvforge_baseline_us": 963.2
+    },
+    "H32_Hkv8_d128_n32768_b1": {
+      "flashinfer_us": 395.65,
+      "kvforge_pick_us": 408.29,
+      "kvforge_oracle_us": 397.73,
+      "sdpa_us": 427.87,
+      "kvforge_baseline_us": 1496.35
+    },
+    "H32_Hkv8_d128_n4096_b8": {
+      "flashinfer_us": 395.81,
+      "kvforge_pick_us": 405.92,
+      "kvforge_oracle_us": 403.9,
+      "sdpa_us": 391.87,
+      "kvforge_baseline_us": 485.47
+    },
+    "H32_Hkv8_d128_n65536_b1": {
+      "flashinfer_us": 772.64,
+      "kvforge_pick_us": 778.94,
+      "kvforge_oracle_us": 771.07,
+      "sdpa_us": 817.66,
+      "kvforge_baseline_us": 2975.74
+    },
+    "H32_Hkv8_d128_n8192_b1": {
+      "flashinfer_us": 107.14,
+      "kvforge_pick_us": 115.97,
+      "kvforge_oracle_us": 111.39,
+      "sdpa_us": 113.34,
+      "kvforge_baseline_us": 394.43
+    },
+    "H32_Hkv8_d64_n16384_b1": {
+      "flashinfer_us": 118.43,
+      "kvforge_pick_us": 121.34,
+      "kvforge_oracle_us": 111.52,
+      "sdpa_us": 113.12,
+      "kvforge_baseline_us": 392.99
+    },
+    "H64_Hkv8_d128_n8192_b1": {
+      "flashinfer_us": 111.1,
+      "kvforge_pick_us": 148.06,
+      "kvforge_oracle_us": 145.82,
+      "sdpa_us": 114.75,
+      "kvforge_baseline_us": 406.53
+    }
+  },
+  "geomean_vs_flashinfer": {
+    "kvforge_pick": {
+      "geomean": 1.062761899872179,
+      "min": 0.9415642647664753,
+      "max": 1.3326732673267327
+    },
+    "kvforge_oracle": {
+      "geomean": 1.0350010415211996,
+      "min": 0.9336871955209773,
+      "max": 1.3125112511251125
+    },
+    "sdpa": {
+      "geomean": 1.0238805029362068,
+      "min": 0.955163387655155,
+      "max": 1.081435612283584
+    },
+    "kvforge_baseline": {
+      "geomean": 2.1186950702878953,
+      "min": 1.0830727841198284,
+      "max": 3.8513926278732655
+    }
+  }
+}

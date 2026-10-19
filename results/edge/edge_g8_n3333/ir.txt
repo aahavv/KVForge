@@ -1,0 +1,23 @@
+--- before planning ---
+module {
+  func @edge_g8_n3333()  // H=16 H_kv=2 g=8 d=64 n=3333 batch=3
+  {
+    %Q = kvf.query : tensor<16x64xf32>
+    %K = kvf.kvcache : kvcache<3333x64x?, ?/?>
+    %V = kvf.kvcache : kvcache<3333x64x?, ?/?>
+    %O = kvf.decode_attn %Q, %K, %V : tensor<16x64xf32> {scale = 0.125}
+    kvf.output %O : tensor<16x64xf32>
+  }
+}
+
+--- after planning ---
+module {
+  func @edge_g8_n3333()  // H=16 H_kv=2 g=8 d=64 n=3333 batch=3
+  {
+    %Q = kvf.query : tensor<16x64xf32>
+    %K = kvf.kvcache : kvcache<3333x64xf16, head_major/contiguous>
+    %V = kvf.kvcache : kvcache<3333x64xf16, head_major/contiguous>
+    %O = kvf.decode_attn_split %Q, %K, %V : tensor<16x64xf32> {scale = 0.125, format = f16, layout = head_major/contiguous, splits = 8, gqa_pack = true, warps = 4, unroll = 2, blocks = 48, pred_us = 43.9065, pred_gbs = 116.6}
+    kvf.output %O : tensor<16x64xf32>
+  }
+}

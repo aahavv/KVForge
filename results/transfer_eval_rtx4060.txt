@@ -1,0 +1,59 @@
+﻿machine rtx4060, constants model\constants_rtx5060.cal, shapes: all
+
+lossless only (f16)
+  shapes 10, rows 3712
+  MAPE            35.210 %
+  Spearman rho    0.454
+  Kendall tau     0.311
+  regret mean     6.574 %
+  regret max      17.291 %
+  top-1 hit       0.000 %
+  H16_Hkv16_d64_n8192_b2  rows=224  rho=-0.175587  tau=-0.164798  regret=2.3569%  chosen=f16 | head_major/contiguous | splits=32 w8 u4 (311.296 us vs best 304.128 us)
+  H32_Hkv32_d128_n16384_b1  rows=224  rho=-0.0934691  tau=-0.0769807  regret=16.5274%  chosen=f16 | head_major/contiguous | splits=32 w8 u4 (1285.12 us vs best 1102.85 us)
+  H32_Hkv32_d128_n4096_b1  rows=192  rho=-0.0165687  tau=-0.0292272  regret=3.04054%  chosen=f16 | head_major/contiguous | splits=32 w8 u4 (312.32 us vs best 303.104 us)
+  H32_Hkv8_d128_n16384_b4  rows=448  rho=0.640503  tau=0.414969  regret=3.74771%  chosen=f16 | head_major/contiguous | splits=64 pack w8 u2 (1162.24 us vs best 1120.26 us)
+  H32_Hkv8_d128_n32768_b1  rows=448  rho=0.689553  tau=0.484608  regret=17.2906%  chosen=f16 | head_major/contiguous | splits=64 pack w8 u2 (673.792 us vs best 574.464 us)
+  H32_Hkv8_d128_n4096_b8  rows=384  rho=0.466964  tau=0.29905  regret=6.2724%  chosen=f16 | head_major/contiguous | splits=32 pack w8 u2 (607.232 us vs best 571.392 us)
+  H32_Hkv8_d128_n65536_b1  rows=448  rho=0.782877  tau=0.566336  regret=1.01664%  chosen=f16 | head_major/contiguous | splits=64 pack w8 u2 (1119.23 us vs best 1107.97 us)
+  H32_Hkv8_d128_n8192_b1  rows=448  rho=0.720644  tau=0.508062  regret=3.5503%  chosen=f16 | head_major/contiguous | splits=2 pack w8 u4 (179.2 us vs best 173.056 us)
+  H32_Hkv8_d64_n16384_b1  rows=448  rho=0.716836  tau=0.507391  regret=1.76471%  chosen=f16 | head_major/contiguous | splits=2 pack w8 u4 (177.152 us vs best 174.08 us)
+  H64_Hkv8_d128_n8192_b1  rows=448  rho=0.810762  tau=0.601873  regret=10.1695%  chosen=f16 | head_major/contiguous | splits=32 pack w8 u2 (199.68 us vs best 181.248 us)
+
+accuracy limit 0.02 (f16 + int8)
+  shapes 10, rows 10464
+  MAPE            27.080 %
+  Spearman rho    0.806
+  Kendall tau     0.607
+  regret mean     11.785 %
+  regret max      42.336 %
+  top-1 hit       0.000 %
+  H16_Hkv16_d64_n8192_b2  rows=448  rho=0.741866  tau=0.503019  regret=2.28571%  chosen=int8:64 | head_major/contiguous | splits=32 w8 u4 (183.296 us vs best 179.2 us)
+  H32_Hkv32_d128_n16384_b1  rows=672  rho=0.804559  tau=0.592366  regret=1.21739%  chosen=int8:128 | head_major/contiguous | splits=32 w8 u4 (595.968 us vs best 588.8 us)
+  H32_Hkv32_d128_n4096_b1  rows=576  rho=0.790683  tau=0.592365  regret=5.26316%  chosen=int8:128 | head_major/contiguous | splits=32 w8 u4 (184.32 us vs best 175.104 us)
+  H32_Hkv8_d128_n16384_b4  rows=1344  rho=0.847052  tau=0.653567  regret=6.1157%  chosen=int8:128 | head_major/contiguous | splits=64 pack w8 u2 (657.408 us vs best 619.52 us)
+  H32_Hkv8_d128_n32768_b1  rows=1344  rho=0.821098  tau=0.634555  regret=2.46914%  chosen=int8:128 | head_major/contiguous | splits=64 pack w8 u2 (339.968 us vs best 331.776 us)
+  H32_Hkv8_d128_n4096_b8  rows=1152  rho=0.783174  tau=0.573193  regret=19.7452%  chosen=int8:128 | head_major/contiguous | splits=8 pack w8 u2 (385.024 us vs best 321.536 us)
+  H32_Hkv8_d128_n65536_b1  rows=1344  rho=0.831137  tau=0.643048  regret=14.6667%  chosen=int8:128 | head_major/contiguous | splits=64 pack w8 u2 (704.512 us vs best 614.4 us)
+  H32_Hkv8_d128_n8192_b1  rows=1344  rho=0.814162  tau=0.626757  regret=12.844%  chosen=int8:128 | head_major/contiguous | splits=64 pack w8 u2 (125.952 us vs best 111.616 us)
+  H32_Hkv8_d64_n16384_b1  rows=896  rho=0.801539  tau=0.610894  regret=10.9091%  chosen=int8:64 | head_major/contiguous | splits=64 pack w8 u2 (124.928 us vs best 112.64 us)
+  H64_Hkv8_d128_n8192_b1  rows=1344  rho=0.827946  tau=0.637991  regret=42.3358%  chosen=f16 | head_major/contiguous | splits=32 pack w8 u2 (199.68 us vs best 140.288 us)
+
+no accuracy limit (f16 + int8 + int4)
+  shapes 10, rows 20928
+  MAPE            22.568 %
+  Spearman rho    0.886
+  Kendall tau     0.714
+  regret mean     16.074 %
+  regret max      54.762 %
+  top-1 hit       0.000 %
+  H16_Hkv16_d64_n8192_b2  rows=896  rho=0.894468  tau=0.701434  regret=13.2743%  chosen=int4:64 | head_major/contiguous | splits=32 w8 u4 (131.072 us vs best 115.712 us)
+  H32_Hkv32_d128_n16384_b1  rows=1344  rho=0.92163  tau=0.74831  regret=16.875%  chosen=int4:128 | head_major/contiguous | splits=32 w8 u4 (382.976 us vs best 327.68 us)
+  H32_Hkv32_d128_n4096_b1  rows=1152  rho=0.916745  tau=0.749894  regret=21.2963%  chosen=int4:128 | head_major/contiguous | splits=32 w8 u4 (134.144 us vs best 110.592 us)
+  H32_Hkv8_d128_n16384_b4  rows=2688  rho=0.918401  tau=0.764827  regret=6.54206%  chosen=int4:128 | head_major/contiguous | splits=16 pack w8 u4 (466.944 us vs best 438.272 us)
+  H32_Hkv8_d128_n32768_b1  rows=2688  rho=0.884295  tau=0.722136  regret=14.346%  chosen=int4:128 | head_major/contiguous | splits=64 pack w8 u4 (277.504 us vs best 242.688 us)
+  H32_Hkv8_d128_n4096_b8  rows=2304  rho=0.861353  tau=0.681402  regret=9.95671%  chosen=int4:128 | head_major/contiguous | splits=8 pack w8 u4 (260.096 us vs best 236.544 us)
+  H32_Hkv8_d128_n65536_b1  rows=2688  rho=0.873778  tau=0.708624  regret=4.86111%  chosen=int4:128 | head_major/contiguous | splits=64 pack w8 u4 (463.872 us vs best 442.368 us)
+  H32_Hkv8_d128_n8192_b1  rows=2688  rho=0.880435  tau=0.716312  regret=12.6582%  chosen=int4:128 | head_major/contiguous | splits=16 pack w8 u4 (91.136 us vs best 80.896 us)
+  H32_Hkv8_d64_n16384_b1  rows=1792  rho=0.881714  tau=0.715512  regret=6.17284%  chosen=int4:64 | head_major/contiguous | splits=16 pack w8 u4 (88.064 us vs best 82.944 us)
+  H64_Hkv8_d128_n8192_b1  rows=2688  rho=0.822366  tau=0.629068  regret=54.7619%  chosen=f16 | head_major/contiguous | splits=32 pack w8 u2 (199.68 us vs best 129.024 us)
+

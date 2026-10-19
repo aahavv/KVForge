@@ -1,0 +1,8 @@
+# Step 1: the naive kernel. Everything is pinned by hand: fp16, one layout,
+# no split-KV, no GQA packing. This is what a straightforward decode kernel does.
+decode baseline(H: 32, H_kv: 8, d: 128, n: 32768, batch: 1) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, f16, token_major, contiguous>
+  V: kvcache<n, d, f16, token_major, contiguous>
+  O = decode_attn(Q, K, V, scale = auto, splits = 1, gqa_pack = false)
+}

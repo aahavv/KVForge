@@ -1,0 +1,837 @@
+{
+  "summary": {
+    "lossless (f16)": {
+      "model_regret_mean": 0.06573663174978292,
+      "model_regret_max": 0.17290552584670227,
+      "borrow_regret_mean": 0.022665673448255784,
+      "borrow_regret_max": 0.07909604519774027,
+      "model_speedup_geomean": 1.4624758174911365,
+      "borrow_speedup_geomean": 1.522240312836976,
+      "nearest_shape_borrow_regret_mean": 0.08109622538478825,
+      "nearest_shape_borrow_regret_max": 0.45882352941176463
+    },
+    "int8 allowed": {
+      "model_regret_mean": 0.11785188539290621,
+      "model_regret_max": 0.42335766423357657,
+      "borrow_regret_mean": 0.0705263518774043,
+      "borrow_regret_max": 0.21656050955414008,
+      "model_speedup_geomean": 2.339872530475772,
+      "borrow_speedup_geomean": 2.434498461563667,
+      "nearest_shape_borrow_regret_mean": 0.12542636007311705,
+      "nearest_shape_borrow_regret_max": 0.6090909090909089
+    },
+    "all formats": {
+      "model_regret_mean": 0.16074447339942988,
+      "model_regret_max": 0.5476190476190477,
+      "borrow_regret_mean": 0.06754558804699184,
+      "borrow_regret_max": 0.17500000000000004,
+      "model_speedup_geomean": 3.197847484066211,
+      "borrow_speedup_geomean": 3.459925955816441,
+      "nearest_shape_borrow_regret_mean": 0.16191108785360725,
+      "nearest_shape_borrow_regret_max": 0.6419753086419753
+    },
+    "gpu_to_gpu_measured_rank_correlation_mean": 0.8490909265245321
+  },
+  "per_shape": {
+    "H16_Hkv16_d64_n8192_b2": {
+      "lossless (f16)": {
+        "oracle_us": 304.128,
+        "model_us": 311.296,
+        "borrow_us": 311.296,
+        "baseline_us": 307.2,
+        "model_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "32",
+          "0",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "32",
+          "0",
+          "8",
+          "4"
+        ]
+      },
+      "int8 allowed": {
+        "oracle_us": 179.2,
+        "model_us": 183.296,
+        "borrow_us": 187.392,
+        "baseline_us": 307.2,
+        "model_plan": [
+          "int8",
+          "64",
+          "head_major",
+          "contiguous",
+          "32",
+          "0",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "int8",
+          "64",
+          "head_major",
+          "contiguous",
+          "64",
+          "0",
+          "4",
+          "2"
+        ]
+      },
+      "all formats": {
+        "oracle_us": 115.712,
+        "model_us": 131.072,
+        "borrow_us": 124.928,
+        "baseline_us": 307.2,
+        "model_plan": [
+          "int4",
+          "64",
+          "head_major",
+          "contiguous",
+          "32",
+          "0",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "int4",
+          "64",
+          "head_major",
+          "contiguous",
+          "32",
+          "0",
+          "4",
+          "4"
+        ]
+      }
+    },
+    "H32_Hkv32_d128_n16384_b1": {
+      "lossless (f16)": {
+        "oracle_us": 1102.848,
+        "model_us": 1285.12,
+        "borrow_us": 1108.992,
+        "baseline_us": 1115.136,
+        "model_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "32",
+          "0",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "f16",
+          "0",
+          "token_major",
+          "contiguous",
+          "16",
+          "0",
+          "8",
+          "4"
+        ]
+      },
+      "int8 allowed": {
+        "oracle_us": 588.8,
+        "model_us": 595.968,
+        "borrow_us": 605.184,
+        "baseline_us": 1115.136,
+        "model_plan": [
+          "int8",
+          "128",
+          "head_major",
+          "contiguous",
+          "32",
+          "0",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "int8",
+          "128",
+          "token_major",
+          "paged",
+          "64",
+          "0",
+          "8",
+          "2"
+        ]
+      },
+      "all formats": {
+        "oracle_us": 327.68,
+        "model_us": 382.976,
+        "borrow_us": 385.024,
+        "baseline_us": 1115.136,
+        "model_plan": [
+          "int4",
+          "128",
+          "head_major",
+          "contiguous",
+          "32",
+          "0",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "int4",
+          "128",
+          "head_major",
+          "contiguous",
+          "32",
+          "0",
+          "4",
+          "4"
+        ]
+      }
+    },
+    "H32_Hkv32_d128_n4096_b1": {
+      "lossless (f16)": {
+        "oracle_us": 303.104,
+        "model_us": 312.32,
+        "borrow_us": 311.296,
+        "baseline_us": 308.224,
+        "model_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "32",
+          "0",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "f16",
+          "0",
+          "token_major",
+          "paged",
+          "16",
+          "0",
+          "8",
+          "4"
+        ]
+      },
+      "int8 allowed": {
+        "oracle_us": 175.104,
+        "model_us": 184.32,
+        "borrow_us": 176.128,
+        "baseline_us": 308.224,
+        "model_plan": [
+          "int8",
+          "128",
+          "head_major",
+          "contiguous",
+          "32",
+          "0",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "int8",
+          "128",
+          "head_major",
+          "paged",
+          "2",
+          "0",
+          "8",
+          "4"
+        ]
+      },
+      "all formats": {
+        "oracle_us": 110.592,
+        "model_us": 134.144,
+        "borrow_us": 124.928,
+        "baseline_us": 308.224,
+        "model_plan": [
+          "int4",
+          "128",
+          "head_major",
+          "contiguous",
+          "32",
+          "0",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "int4",
+          "128",
+          "head_major",
+          "contiguous",
+          "32",
+          "0",
+          "4",
+          "4"
+        ]
+      }
+    },
+    "H32_Hkv8_d128_n16384_b4": {
+      "lossless (f16)": {
+        "oracle_us": 1120.256,
+        "model_us": 1162.24,
+        "borrow_us": 1132.544,
+        "baseline_us": 1135.616,
+        "model_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "64",
+          "1",
+          "8",
+          "2"
+        ],
+        "borrow_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "8",
+          "1",
+          "8",
+          "4"
+        ]
+      },
+      "int8 allowed": {
+        "oracle_us": 619.52,
+        "model_us": 657.408,
+        "borrow_us": 633.856,
+        "baseline_us": 1135.616,
+        "model_plan": [
+          "int8",
+          "128",
+          "head_major",
+          "contiguous",
+          "64",
+          "1",
+          "8",
+          "2"
+        ],
+        "borrow_plan": [
+          "int8",
+          "128",
+          "token_major",
+          "contiguous",
+          "8",
+          "1",
+          "8",
+          "4"
+        ]
+      },
+      "all formats": {
+        "oracle_us": 438.272,
+        "model_us": 466.944,
+        "borrow_us": 451.584,
+        "baseline_us": 1135.616,
+        "model_plan": [
+          "int4",
+          "128",
+          "head_major",
+          "contiguous",
+          "16",
+          "1",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "int4",
+          "64",
+          "head_major",
+          "contiguous",
+          "16",
+          "1",
+          "4",
+          "4"
+        ]
+      }
+    },
+    "H32_Hkv8_d128_n32768_b1": {
+      "lossless (f16)": {
+        "oracle_us": 574.464,
+        "model_us": 673.792,
+        "borrow_us": 587.776,
+        "baseline_us": 1433.6,
+        "model_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "64",
+          "1",
+          "8",
+          "2"
+        ],
+        "borrow_plan": [
+          "f16",
+          "0",
+          "token_major",
+          "paged",
+          "64",
+          "1",
+          "4",
+          "4"
+        ]
+      },
+      "int8 allowed": {
+        "oracle_us": 331.776,
+        "model_us": 339.968,
+        "borrow_us": 350.208,
+        "baseline_us": 1433.6,
+        "model_plan": [
+          "int8",
+          "128",
+          "head_major",
+          "contiguous",
+          "64",
+          "1",
+          "8",
+          "2"
+        ],
+        "borrow_plan": [
+          "int8",
+          "64",
+          "head_major",
+          "contiguous",
+          "64",
+          "1",
+          "4",
+          "4"
+        ]
+      },
+      "all formats": {
+        "oracle_us": 242.688,
+        "model_us": 277.504,
+        "borrow_us": 243.712,
+        "baseline_us": 1433.6,
+        "model_plan": [
+          "int4",
+          "128",
+          "head_major",
+          "contiguous",
+          "64",
+          "1",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "int4",
+          "64",
+          "head_major",
+          "contiguous",
+          "32",
+          "1",
+          "4",
+          "4"
+        ]
+      }
+    },
+    "H32_Hkv8_d128_n4096_b8": {
+      "lossless (f16)": {
+        "oracle_us": 571.392,
+        "model_us": 607.232,
+        "borrow_us": 573.44,
+        "baseline_us": 706.56,
+        "model_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "32",
+          "1",
+          "8",
+          "2"
+        ],
+        "borrow_plan": [
+          "f16",
+          "0",
+          "token_major",
+          "paged",
+          "1",
+          "1",
+          "4",
+          "4"
+        ]
+      },
+      "int8 allowed": {
+        "oracle_us": 321.536,
+        "model_us": 385.024,
+        "borrow_us": 391.168,
+        "baseline_us": 706.56,
+        "model_plan": [
+          "int8",
+          "128",
+          "head_major",
+          "contiguous",
+          "8",
+          "1",
+          "8",
+          "2"
+        ],
+        "borrow_plan": [
+          "int8",
+          "128",
+          "head_major",
+          "contiguous",
+          "8",
+          "1",
+          "4",
+          "4"
+        ]
+      },
+      "all formats": {
+        "oracle_us": 236.544,
+        "model_us": 260.096,
+        "borrow_us": 243.712,
+        "baseline_us": 706.56,
+        "model_plan": [
+          "int4",
+          "128",
+          "head_major",
+          "contiguous",
+          "8",
+          "1",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "int4",
+          "128",
+          "head_major",
+          "contiguous",
+          "8",
+          "1",
+          "4",
+          "4"
+        ]
+      }
+    },
+    "H32_Hkv8_d128_n65536_b1": {
+      "lossless (f16)": {
+        "oracle_us": 1107.968,
+        "model_us": 1119.232,
+        "borrow_us": 1115.136,
+        "baseline_us": 2795.52,
+        "model_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "64",
+          "1",
+          "8",
+          "2"
+        ],
+        "borrow_plan": [
+          "f16",
+          "0",
+          "token_major",
+          "contiguous",
+          "32",
+          "1",
+          "8",
+          "4"
+        ]
+      },
+      "int8 allowed": {
+        "oracle_us": 614.4,
+        "model_us": 704.512,
+        "borrow_us": 650.24,
+        "baseline_us": 2795.52,
+        "model_plan": [
+          "int8",
+          "128",
+          "head_major",
+          "contiguous",
+          "64",
+          "1",
+          "8",
+          "2"
+        ],
+        "borrow_plan": [
+          "int8",
+          "64",
+          "head_major",
+          "contiguous",
+          "32",
+          "1",
+          "8",
+          "4"
+        ]
+      },
+      "all formats": {
+        "oracle_us": 442.368,
+        "model_us": 463.872,
+        "borrow_us": 455.68,
+        "baseline_us": 2795.52,
+        "model_plan": [
+          "int4",
+          "128",
+          "head_major",
+          "contiguous",
+          "64",
+          "1",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "int4",
+          "128",
+          "head_major",
+          "contiguous",
+          "32",
+          "1",
+          "4",
+          "4"
+        ]
+      }
+    },
+    "H32_Hkv8_d128_n8192_b1": {
+      "lossless (f16)": {
+        "oracle_us": 173.056,
+        "model_us": 179.2,
+        "borrow_us": 177.152,
+        "baseline_us": 380.928,
+        "model_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "2",
+          "1",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "f16",
+          "0",
+          "token_major",
+          "contiguous",
+          "32",
+          "1",
+          "8",
+          "4"
+        ]
+      },
+      "int8 allowed": {
+        "oracle_us": 111.616,
+        "model_us": 125.952,
+        "borrow_us": 124.928,
+        "baseline_us": 380.928,
+        "model_plan": [
+          "int8",
+          "128",
+          "head_major",
+          "contiguous",
+          "64",
+          "1",
+          "8",
+          "2"
+        ],
+        "borrow_plan": [
+          "int8",
+          "128",
+          "head_major",
+          "contiguous",
+          "64",
+          "1",
+          "4",
+          "4"
+        ]
+      },
+      "all formats": {
+        "oracle_us": 80.896,
+        "model_us": 91.136,
+        "borrow_us": 88.064,
+        "baseline_us": 380.928,
+        "model_plan": [
+          "int4",
+          "128",
+          "head_major",
+          "contiguous",
+          "16",
+          "1",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "int4",
+          "128",
+          "token_major",
+          "contiguous",
+          "16",
+          "1",
+          "8",
+          "4"
+        ]
+      }
+    },
+    "H32_Hkv8_d64_n16384_b1": {
+      "lossless (f16)": {
+        "oracle_us": 174.08,
+        "model_us": 177.152,
+        "borrow_us": 178.176,
+        "baseline_us": 378.88,
+        "model_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "2",
+          "1",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "32",
+          "1",
+          "4",
+          "4"
+        ]
+      },
+      "int8 allowed": {
+        "oracle_us": 112.64,
+        "model_us": 124.928,
+        "borrow_us": 120.832,
+        "baseline_us": 378.88,
+        "model_plan": [
+          "int8",
+          "64",
+          "head_major",
+          "contiguous",
+          "64",
+          "1",
+          "8",
+          "2"
+        ],
+        "borrow_plan": [
+          "int8",
+          "64",
+          "head_major",
+          "contiguous",
+          "64",
+          "1",
+          "4",
+          "4"
+        ]
+      },
+      "all formats": {
+        "oracle_us": 82.944,
+        "model_us": 88.064,
+        "borrow_us": 83.968,
+        "baseline_us": 378.88,
+        "model_plan": [
+          "int4",
+          "64",
+          "head_major",
+          "contiguous",
+          "16",
+          "1",
+          "8",
+          "4"
+        ],
+        "borrow_plan": [
+          "int4",
+          "64",
+          "head_major",
+          "contiguous",
+          "32",
+          "1",
+          "4",
+          "4"
+        ]
+      }
+    },
+    "H64_Hkv8_d128_n8192_b1": {
+      "lossless (f16)": {
+        "oracle_us": 181.248,
+        "model_us": 199.68,
+        "borrow_us": 195.584,
+        "baseline_us": 385.024,
+        "model_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "32",
+          "1",
+          "8",
+          "2"
+        ],
+        "borrow_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "32",
+          "1",
+          "4",
+          "4"
+        ]
+      },
+      "int8 allowed": {
+        "oracle_us": 140.288,
+        "model_us": 199.68,
+        "borrow_us": 151.552,
+        "baseline_us": 385.024,
+        "model_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "32",
+          "1",
+          "8",
+          "2"
+        ],
+        "borrow_plan": [
+          "int8",
+          "128",
+          "token_major",
+          "contiguous",
+          "32",
+          "1",
+          "4",
+          "4"
+        ]
+      },
+      "all formats": {
+        "oracle_us": 129.024,
+        "model_us": 199.68,
+        "borrow_us": 141.312,
+        "baseline_us": 385.024,
+        "model_plan": [
+          "f16",
+          "0",
+          "head_major",
+          "contiguous",
+          "32",
+          "1",
+          "8",
+          "2"
+        ],
+        "borrow_plan": [
+          "int4",
+          "128",
+          "token_major",
+          "contiguous",
+          "32",
+          "1",
+          "4",
+          "4"
+        ]
+      }
+    }
+  }
+}

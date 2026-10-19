@@ -1,0 +1,12 @@
+# Multi-head attention (g = 1): the worst case for arithmetic intensity, 1 FLOP
+# per byte in fp16. GQA packing does not apply, so the search is over format,
+# layout and splitting only.
+target machine = "machines/generic-gpu.gpu"
+target max_rel_err = 0.1
+
+decode mha_4k(H: 32, H_kv: 32, d: 128, n: 4096, batch: 1) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, ?, ?, ?>
+  V: kvcache<n, d, ?, ?, ?>
+  O = decode_attn(Q, K, V, scale = auto, splits = ?, gqa_pack = ?)
+}

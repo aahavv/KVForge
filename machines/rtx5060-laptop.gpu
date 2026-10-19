@@ -1,0 +1,19 @@
+# Measured by bench/bw_probe on NVIDIA GeForce RTX 5060 Laptop GPU
+# stride test, ns per 4-byte access:  4B=0.017  8B=0.025  16B=0.047  32B=0.091  64B=0.091  128B=0.092
+name = rtx5060-laptop
+compute_capability = 12.0
+dram_gb = 8.5
+sms = 26
+bw_peak_gbs = 341.3
+bw_sm_gbs = 79.11
+lat_ns = 148
+bw_l2_gbs = 1581
+l2_bytes = 33554432
+sector_bytes = 32
+line_bytes = 128
+f32_gflops = 16026
+launch_us = 20.83
+max_warps_per_sm = 48
+max_blocks_per_sm = 24
+regs_per_sm = 65536
+resources = resources_sm120.csv

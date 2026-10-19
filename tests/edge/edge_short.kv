@@ -1,0 +1,10 @@
+# Edge shape for correctness testing: context shorter than one block step, no splitting possible
+target machine = "machines/rtx5060-laptop.gpu"
+target include_quantized = 1
+
+decode edge_short(H: 8, H_kv: 8, d: 64, n: 100, batch: 1) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, ?, ?, ?>
+  V: kvcache<n, d, ?, ?, ?>
+  O = decode_attn(Q, K, V, scale = auto, splits = ?, gqa_pack = ?)
+}

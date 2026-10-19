@@ -1,0 +1,10 @@
+# Edge shape for correctness testing: odd context length, g = 3 so GQA packing is not offered
+target machine = "machines/rtx5060-laptop.gpu"
+target include_quantized = 1
+
+decode edge_odd_n(H: 12, H_kv: 4, d: 128, n: 1001, batch: 2) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, ?, ?, ?>
+  V: kvcache<n, d, ?, ?, ?>
+  O = decode_attn(Q, K, V, scale = auto, splits = ?, gqa_pack = ?)
+}

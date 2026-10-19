@@ -1,0 +1,10 @@
+# Edge shape for correctness testing: g = 8, n not a multiple of any page size
+target machine = "machines/rtx5060-laptop.gpu"
+target include_quantized = 1
+
+decode edge_g8_n3333(H: 16, H_kv: 2, d: 64, n: 3333, batch: 3) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, ?, ?, ?>
+  V: kvcache<n, d, ?, ?, ?>
+  O = decode_attn(Q, K, V, scale = auto, splits = ?, gqa_pack = ?)
+}

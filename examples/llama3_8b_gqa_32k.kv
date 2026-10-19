@@ -1,0 +1,14 @@
+# Llama-3-8B shape: 32 query heads over 8 KV heads, so g = 4. Every field of the
+# cache is '?', which is how a program says "compiler, choose this".
+#
+# `max_rel_err` is the accuracy budget: it is what permits the lossy int8 / int4
+# formats. Remove it and only lossless fp16 is searched.
+target machine = "machines/generic-gpu.gpu"
+target max_rel_err = 0.02
+
+decode llama3_8b(H: 32, H_kv: 8, d: 128, n: 32768, batch: 1) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, ?, ?, ?>
+  V: kvcache<n, d, ?, ?, ?>
+  O = decode_attn(Q, K, V, scale = auto, splits = ?, gqa_pack = ?)
+}

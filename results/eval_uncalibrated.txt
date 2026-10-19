@@ -1,0 +1,32 @@
+﻿machine rtx5060-laptop, constants defaults, shapes: all
+
+lossless only (f16)
+  shapes 10, rows 3712
+  MAPE            45.665 %
+  Spearman rho    0.536
+  Kendall tau     0.370
+  regret mean     22.849 %
+  regret max      39.011 %
+  top-1 hit       0.000 %
+  H16_Hkv16_d64_n8192_b2  rows=224  rho=0.180857  tau=0.108073  regret=10.0746%  chosen=f16 | head_major/contiguous | splits=64 w4 u2 (222.016 us vs best 201.696 us)
+  H32_Hkv32_d128_n16384_b1  rows=224  rho=0.0761555  tau=0.042217  regret=29.6077%  chosen=f16 | head_major/contiguous | splits=64 w4 u2 (995.968 us vs best 768.448 us)
+  H32_Hkv32_d128_n4096_b1  rows=192  rho=0.207105  tau=0.109697  regret=12.2013%  chosen=f16 | head_major/contiguous | splits=4 w4 u2 (228.352 us vs best 203.52 us)
+  H32_Hkv8_d128_n16384_b4  rows=448  rho=0.780515  tau=0.552113  regret=7.75923%  chosen=f16 | head_major/contiguous | splits=64 pack w4 u2 (832.384 us vs best 772.448 us)
+  H32_Hkv8_d128_n32768_b1  rows=448  rho=0.661772  tau=0.449137  regret=39.0108%  chosen=f16 | head_major/contiguous | splits=16 pack w4 u2 (551.328 us vs best 396.608 us)
+  H32_Hkv8_d128_n4096_b8  rows=384  rho=0.725545  tau=0.507879  regret=38.284%  chosen=f16 | head_major/contiguous | splits=2 pack w4 u2 (555.968 us vs best 402.048 us)
+  H32_Hkv8_d128_n65536_b1  rows=448  rho=0.692789  tau=0.490792  regret=21.5178%  chosen=f16 | head_major/contiguous | splits=16 pack w4 u2 (936.64 us vs best 770.784 us)
+  H32_Hkv8_d128_n8192_b1  rows=448  rho=0.659736  tau=0.464321  regret=27.9758%  chosen=f16 | head_major/contiguous | splits=16 pack w4 u2 (142.432 us vs best 111.296 us)
+  H32_Hkv8_d64_n16384_b1  rows=448  rho=0.649423  tau=0.456016  regret=27.5683%  chosen=f16 | head_major/contiguous | splits=16 pack w4 u2 (141.856 us vs best 111.2 us)
+  H64_Hkv8_d128_n8192_b1  rows=448  rho=0.726452  tau=0.518951  regret=14.486%  chosen=f16 | head_major/contiguous | splits=16 pack w4 u2 (164.64 us vs best 143.808 us)
+
+accuracy limit 0.02 (f16 + int8)
+  shapes 10, rows 10464
+  MAPE            41.973 %
+  Spearman rho    0.690
+  Kendall tau     0.491
+  regret mean     20.831 %
+  regret max      45.440 %
+  top-1 hit       10.000 %
+  H16_Hkv16_d64_n8192_b2  rows=448  rho=0.436619  tau=0.276607  regret=0%  chosen=int8:64 | head_major/contiguous | splits=64 w4 u2 (117.376 us vs best 117.376 us)
+  H32_Hkv32_d128_n16384_b1  rows=672  rho=0.525917  tau=0.328118  regret=6.48141%  chosen=int8:128 | head_major/contiguous | splits=64 w4 u2 (438.976 us vs best 412.256 us)
+  H32_Hkv32_d128_n4096_b1  rows=576  rho=0.60386  tau=0.409152  regret=15.2672%  chosen=int8:128 | head_major/contiguous | splits=4 w4 u2 (130.464 us vs best 113.184 us)

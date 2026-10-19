@@ -1,0 +1,95 @@
+kvf plan report
+===============
+
+Operator: decode-phase attention, one layer, one decode step.
+The KV cache is read once per step and each byte is used once, so the
+compiler's lever is bytes moved and the order they are moved in, not
+tile size.
+
+Spec: edge_short
+  H = 8   H_kv = 8   g = 1   d = 64   n = 100   batch = 1
+  scale = 0.125
+
+Machine: rtx5060-laptop  (machines/rtx5060-laptop.gpu)
+  SMs = 26   bw_sm = 79.1 GB/s   bw_peak = 341.3 GB/s   latency = 148 ns
+  ridge = 46.96 FLOP/byte
+  calibration: defaults
+
+Search space: format free, layout free, splits free, gqa_pack free, lossy formats included
+Candidates evaluated: 128
+
+Chosen plan
+-----------
+  format:    f16  (16.00 bits/element)
+  layout:    head_major/contiguous
+  partition: splits=1 w8 u4   blocks = 8   active SMs = 8
+
+Predicted cost
+--------------
+  KV payload           0.20 MiB
+  metadata             0.00 MiB
+  Q read + O write     0.00 MiB
+  split partials       0.00 MiB
+  total traffic        0.20 MiB
+  attention FLOPs          0.20 M
+  dequant FLOPs            0.05 M
+  intensity               1.225 FLOP/byte
+  layout eta              0.995
+  bytes in flight          32.0 KiB per SM
+  BW_eff                  339.6 GB/s
+  T_mem                    0.62 us
+  T_cmp                    0.61 us
+  T_merge                  0.00 us
+  T_page                   0.00 us
+  T_launch                10.41 us
+  T_total                 11.14 us   (memory bound)
+  achieved                 18.4 GB/s = 5.4% of peak
+
+Candidate ranking
+-----------------
+#   plan                                                              us     GB/s   %peak       I  blocks    eta  bound  status
+----------------------------------------------------------------------------------------------------------------------
+1   f16 | head_major/contiguous | splits=1 w8 u4                   11.14     18.4     5.4    1.23       8   1.00  mem    ok
+... 127 more candidates in plans.csv
+
+Roofline position of this operator
+---------------------------------
+Ridge point of rtx5060-laptop: 46.96 FLOP/byte  (16.03 TFLOP/s over 341.3 GB/s)
+Decode intensity is 2g/b_eff FLOP/byte and does not depend on n:
+  4*n*d FLOPs per query head over 2*n*d*b_eff bytes per KV head.
+
+format        bits/elem       g=1       g=4       g=8   verdict at this spec (g=1)
+------------------------------------------------------------------------
+f16               16.00      1.00      4.00      8.00   memory bound
+int8:64            8.50      1.88      7.53     15.06   memory bound
+int4:32            5.00      3.20     12.80     25.60   memory bound
+int4:64            4.50      3.56     14.22     28.44   memory bound
+
+b_eff for a quantized format is bits + metadata_bits/group, so
+int4:128 with an fp16 scale and zero point costs 4 + 32/128 = 4.25
+bits per element, not 4.
+
+--- IR before planning ---
+module {
+  func @edge_short()  // H=8 H_kv=8 g=1 d=64 n=100 batch=1
+  {
+    %Q = kvf.query : tensor<8x64xf32>
+    %K = kvf.kvcache : kvcache<100x64x?, ?/?>
+    %V = kvf.kvcache : kvcache<100x64x?, ?/?>
+    %O = kvf.decode_attn %Q, %K, %V : tensor<8x64xf32> {scale = 0.125}
+    kvf.output %O : tensor<8x64xf32>
+  }
+}
+
+--- IR after planning ---
+module {
+  func @edge_short()  // H=8 H_kv=8 g=1 d=64 n=100 batch=1
+  {
+    %Q = kvf.query : tensor<8x64xf32>
+    %K = kvf.kvcache : kvcache<100x64xf16, head_major/contiguous>
+    %V = kvf.kvcache : kvcache<100x64xf16, head_major/contiguous>
+    %O = kvf.decode_attn_split %Q, %K, %V : tensor<8x64xf32> {scale = 0.125, format = f16, layout = head_major/contiguous, splits = 1, gqa_pack = false, warps = 8, unroll = 4, blocks = 8, pred_us = 11.1435, pred_gbs = 18.3784}
+    kvf.output %O : tensor<8x64xf32>
+  }
+}
+

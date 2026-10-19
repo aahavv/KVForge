@@ -1,0 +1,131 @@
+﻿
+==============================================================================
+  0. The machine, as measured by bw_probe (no datasheet numbers)
+==============================================================================
+name = rtx5060-laptop
+compute_capability = 12
+dram_gb = 8.5
+sms = 26
+bw_peak_gbs = 341.3
+bw_sm_gbs = 79.11
+lat_ns = 148
+bw_l2_gbs = 1581
+l2_bytes = 33554432
+sector_bytes = 32
+line_bytes = 128
+f32_gflops = 16026
+launch_us = 20.83
+max_warps_per_sm = 48
+max_blocks_per_sm = 24
+regs_per_sm = 65536
+resources = resources_sm120.csv
+# derived
+# ridge          = 46.9558 FLOP/byte
+# f_sm_gflops    = 616.385
+# bw_device(all, full flight) = 341.3 GB/s
+
+==============================================================================
+  1. Naive kernel: everything pinned by hand
+==============================================================================
+--- program demo\1_baseline.kv ---
+# Step 1: the naive kernel. Everything is pinned by hand: fp16, one layout,
+# no split-KV, no GQA packing. This is what a straightforward decode kernel does.
+decode baseline(H: 32, H_kv: 8, d: 128, n: 32768, batch: 1) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, f16, token_major, contiguous>
+  V: kvcache<n, d, f16, token_major, contiguous>
+  O = decode_attn(Q, K, V, scale = auto, splits = 1, gqa_pack = false)
+}
+--- compiler decision ---
+Search space: format pinned, layout pinned, splits pinned, gqa_pack pinned, lossy formats excluded
+Candidates evaluated: 4
+  format:    f16  (16.00 bits/element)
+  layout:    token_major/contiguous
+  partition: splits=1 w8 u2   blocks = 32   active SMs = 26
+  T_total               1168.12 us   (memory bound)
+--- generated CUDA: out\demo\1_baseline\decode_baseline.cu ; compiling and running ---
+built C:\Users\aahav\KVForge\out\demo\1_baseline\bench.exe
+device: NVIDIA GeForce RTX 5060 Laptop GPU
+plan:   f16 | token_major/contiguous | splits=1 w8 u2
+check:    relative error vs dequantised reference 8.36e-07 (PASS)
+accuracy: relative error vs exact fp32 attention 0.0003
+time:     844.96 us median (IQR 843.62..846.14, 50 reps)
+rate:     158.8 GB/s of KV payload
+predicted 1168.12 us, measured 844.96 us (ratio 0.72)
+
+==============================================================================
+  2. Compiler chooses layout + partition (fp16 only)
+==============================================================================
+--- program demo\2_lossless.kv ---
+# Step 2: same Llama-3-8B layer, but the layout and partition are '?':
+# "compiler, choose". No accuracy budget, so only lossless fp16 is allowed.
+decode lossless(H: 32, H_kv: 8, d: 128, n: 32768, batch: 1) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, ?, ?, ?>
+  V: kvcache<n, d, ?, ?, ?>
+  O = decode_attn(Q, K, V, scale = auto, splits = ?, gqa_pack = ?)
+}
+--- compiler decision ---
+Search space: format free, layout free, splits free, gqa_pack free, lossy formats excluded
+Candidates evaluated: 448
+  format:    f16  (16.00 bits/element)
+  layout:    head_major/contiguous
+  partition: splits=32 pack w8 u2   blocks = 256   active SMs = 26
+  T_total                425.42 us   (memory bound)
+--- generated CUDA: out\demo\2_lossless\decode_lossless.cu ; compiling and running ---
+built C:\Users\aahav\KVForge\out\demo\2_lossless\bench.exe
+device: NVIDIA GeForce RTX 5060 Laptop GPU
+plan:   f16 | head_major/contiguous | splits=32 pack w8 u2
+check:    relative error vs dequantised reference 2.82e-07 (PASS)
+accuracy: relative error vs exact fp32 attention 0.0003
+time:     430.40 us median (IQR 427.07..432.45, 50 reps)
+rate:     311.8 GB/s of KV payload
+predicted 425.42 us, measured 430.40 us (ratio 1.01)
+
+==============================================================================
+  3. Compiler may also choose int8/int4, within 2% error
+==============================================================================
+--- program demo\3_budget.kv ---
+# Step 3: same program plus an accuracy budget of 2% relative error.
+# The budget is what lets the compiler consider int8 / int4 caches; the
+# accuracy gate rejects any format whose calibrated error is above it.
+target max_rel_err = 0.02
+
+decode budget(H: 32, H_kv: 8, d: 128, n: 32768, batch: 1) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, ?, ?, ?>
+  V: kvcache<n, d, ?, ?, ?>
+  O = decode_attn(Q, K, V, scale = auto, splits = ?, gqa_pack = ?)
+}
+--- compiler decision ---
+Search space: format free, layout free, splits free, gqa_pack free, lossy formats included (accuracy limit 0.02)
+Candidates evaluated: 2688
+  format:    int8:128  (8.25 bits/element)
+  layout:    head_major/contiguous
+  partition: splits=32 pack w8 u4   blocks = 256   active SMs = 26
+  accuracy:  calibrated relative error 0.00838787
+  T_total                313.48 us   (compute bound)
+--- generated CUDA: out\demo\3_budget\decode_budget.cu ; compiling and running ---
+built C:\Users\aahav\KVForge\out\demo\3_budget\bench.exe
+device: NVIDIA GeForce RTX 5060 Laptop GPU
+plan:   int8:128 | head_major/contiguous | splits=32 pack w8 u4
+check:    relative error vs dequantised reference 3.59e-07 (PASS)
+accuracy: relative error vs exact fp32 attention 0.00839
+time:     273.28 us median (IQR 271.36..274.98, 50 reps)
+rate:     253.2 GB/s of KV payload
+predicted 313.48 us, measured 273.28 us (ratio 0.87)
+
+==============================================================================
+  Summary: same layer, same GPU, three programs
+==============================================================================
+
+step       plan                                                    verified error   predicted_us measured_us speedup
+----       ----                                                    -------- -----   ------------ ----------- -------
+1_baseline f16 | token_major/contiguous | splits=1 w8 u2           PASS     0.0003       1168.12      844.96 1.00x  
+2_lossless f16 | head_major/contiguous | splits=32 pack w8 u2      PASS     0.0003        425.42       430.4 1.96x  
+3_budget   int8:128 | head_major/contiguous | splits=32 pack w8 u4 PASS     0.00839       313.48      273.28 3.09x  
+
+
+
+Every number above was just measured on this GPU; the cost model's constants were
+fitted once and not changed (model\constants_rtx5060.cal). Reports: out\demo\*\report.txt

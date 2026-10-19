@@ -1,0 +1,18 @@
+# Measured by bench/bw_probe on NVIDIA GeForce RTX 4060 Laptop GPU
+# stride test, ns per 4-byte access:  4B=0.019  8B=0.033  16B=0.064  32B=0.128  64B=0.129  128B=0.129
+name = rtx4060
+compute_capability = 8.9
+dram_gb = 8.6
+sms = 24
+bw_peak_gbs = 250.4
+bw_sm_gbs = 85.14
+lat_ns = 128
+bw_l2_gbs = 1630
+l2_bytes = 33554432
+sector_bytes = 32
+line_bytes = 128
+f32_gflops = 13346
+launch_us = 5.12
+max_warps_per_sm = 48
+max_blocks_per_sm = 24
+regs_per_sm = 65536

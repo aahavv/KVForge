@@ -1,0 +1,23 @@
+--- before planning ---
+module {
+  func @mha_16k()  // H=32 H_kv=32 g=1 d=128 n=16384 batch=1
+  {
+    %Q = kvf.query : tensor<32x128xf32>
+    %K = kvf.kvcache : kvcache<16384x128x?, ?/?>
+    %V = kvf.kvcache : kvcache<16384x128x?, ?/?>
+    %O = kvf.decode_attn %Q, %K, %V : tensor<32x128xf32> {scale = 0.0883883}
+    kvf.output %O : tensor<32x128xf32>
+  }
+}
+
+--- after planning ---
+module {
+  func @mha_16k()  // H=32 H_kv=32 g=1 d=128 n=16384 batch=1
+  {
+    %Q = kvf.query : tensor<32x128xf32>
+    %K = kvf.kvcache : kvcache<16384x128xint4:128, head_major/contiguous>
+    %V = kvf.kvcache : kvcache<16384x128xint4:128, head_major/contiguous>
+    %O = kvf.decode_attn_split %Q, %K, %V : tensor<32x128xf32> {scale = 0.0883883, format = int4:128, layout = head_major/contiguous, splits = 64, gqa_pack = false, warps = 4, unroll = 2, blocks = 2048, pred_us = 253.448, pred_gbs = 281.333}
+    kvf.output %O : tensor<32x128xf32>
+  }
+}

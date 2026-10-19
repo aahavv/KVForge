@@ -1,0 +1,91 @@
+shape,method,t_us,p25,p75,err_vs_fp32,note
+H16_Hkv16_d64_n8192_b2,kvforge_baseline,256.86,255.52,258.11,9.200e-07,splits=1 pack=0 w4 u2 token_major
+H16_Hkv16_d64_n8192_b2,kvforge_pick,222.11,221.54,223.74,8.630e-07,splits=4 pack=0 w4 u2 head_major
+H16_Hkv16_d64_n8192_b2,kvforge_oracle,219.65,218.11,220.03,8.549e-07,splits=32 pack=0 w8 u4 head_major
+H16_Hkv16_d64_n8192_b2,sdpa_default,224.90,223.04,227.07,3.516e-04,
+H16_Hkv16_d64_n8192_b2,sdpa_flash,223.20,221.60,225.76,3.516e-04,
+H16_Hkv16_d64_n8192_b2,sdpa_efficient,518.53,516.51,521.15,3.575e-04,
+H16_Hkv16_d64_n8192_b2,sdpa_cudnn,197.28,196.54,197.50,3.555e-04,
+H16_Hkv16_d64_n8192_b2,flashinfer_batch_paged16_tc0,199.20,197.22,201.06,2.986e-04,
+H16_Hkv16_d64_n8192_b2,flashinfer_batch_paged16_tc1,241.98,235.33,250.43,3.562e-04,
+H32_Hkv32_d128_n16384_b1,kvforge_baseline,893.73,891.46,897.60,1.815e-06,splits=1 pack=0 w4 u2 token_major
+H32_Hkv32_d128_n16384_b1,kvforge_pick,776.96,775.20,779.01,1.674e-06,splits=4 pack=0 w4 u2 head_major
+H32_Hkv32_d128_n16384_b1,kvforge_oracle,770.46,768.51,772.58,1.614e-06,splits=16 pack=0 w8 u4 token_major
+H32_Hkv32_d128_n16384_b1,sdpa_default,829.47,827.97,832.32,3.548e-04,
+H32_Hkv32_d128_n16384_b1,sdpa_flash,830.40,829.47,831.94,3.548e-04,
+H32_Hkv32_d128_n16384_b1,sdpa_efficient,2043.30,2040.83,2044.32,3.665e-04,
+H32_Hkv32_d128_n16384_b1,sdpa_cudnn,865.18,864.45,867.74,3.606e-04,
+H32_Hkv32_d128_n16384_b1,flashinfer_batch_paged16_tc0,825.18,821.73,827.58,2.924e-04,
+H32_Hkv32_d128_n16384_b1,flashinfer_batch_paged16_tc1,869.82,867.17,870.66,3.539e-04,
+H32_Hkv32_d128_n4096_b1,kvforge_baseline,263.87,261.82,264.61,9.410e-07,splits=1 pack=0 w4 u2 token_major
+H32_Hkv32_d128_n4096_b1,kvforge_pick,222.11,221.82,223.58,8.805e-07,splits=4 pack=0 w4 u2 head_major
+H32_Hkv32_d128_n4096_b1,kvforge_oracle,209.54,207.94,221.95,8.654e-07,splits=16 pack=0 w4 u4 token_major
+H32_Hkv32_d128_n4096_b1,sdpa_default,213.70,211.36,214.21,3.420e-04,
+H32_Hkv32_d128_n4096_b1,sdpa_flash,214.24,213.15,214.66,3.420e-04,
+H32_Hkv32_d128_n4096_b1,sdpa_efficient,532.74,531.62,533.25,3.423e-04,
+H32_Hkv32_d128_n4096_b1,sdpa_cudnn,216.38,215.49,217.70,3.447e-04,
+H32_Hkv32_d128_n4096_b1,flashinfer_batch_paged16_tc0,200.80,200.38,201.12,2.863e-04,
+H32_Hkv32_d128_n4096_b1,flashinfer_batch_paged16_tc1,215.87,214.18,217.57,3.392e-04,
+H32_Hkv8_d128_n16384_b4,kvforge_baseline,963.20,944.80,967.55,9.195e-07,splits=1 pack=0 w4 u2 token_major
+H32_Hkv8_d128_n16384_b4,kvforge_pick,777.47,776.67,779.14,4.185e-07,splits=8 pack=1 w8 u2 head_major
+H32_Hkv8_d128_n16384_b4,kvforge_oracle,773.12,772.48,774.59,4.185e-07,splits=8 pack=1 w8 u4 head_major
+H32_Hkv8_d128_n16384_b4,sdpa_default,783.78,781.86,784.93,3.588e-04,
+H32_Hkv8_d128_n16384_b4,sdpa_flash,782.82,781.76,784.67,3.588e-04,
+H32_Hkv8_d128_n16384_b4,sdpa_efficient,5026.94,5023.10,5031.71,3.642e-04,
+H32_Hkv8_d128_n16384_b4,sdpa_cudnn,815.58,813.66,816.67,3.597e-04,
+H32_Hkv8_d128_n16384_b4,flashinfer_batch_paged16_tc0,774.56,772.80,776.38,3.647e-04,
+H32_Hkv8_d128_n16384_b4,flashinfer_batch_paged16_tc1,782.30,778.98,787.20,3.563e-04,
+H32_Hkv8_d128_n32768_b1,kvforge_baseline,1496.35,1494.05,1498.37,1.232e-06,splits=1 pack=0 w4 u2 token_major
+H32_Hkv8_d128_n32768_b1,kvforge_pick,408.29,406.66,408.64,4.017e-07,splits=32 pack=1 w8 u2 head_major
+H32_Hkv8_d128_n32768_b1,kvforge_oracle,397.73,396.22,398.27,4.017e-07,splits=32 pack=1 w8 u4 token_major
+H32_Hkv8_d128_n32768_b1,sdpa_default,427.87,426.40,430.78,3.537e-04,
+H32_Hkv8_d128_n32768_b1,sdpa_flash,428.58,426.91,429.95,3.537e-04,
+H32_Hkv8_d128_n32768_b1,sdpa_efficient,4028.99,4026.40,4033.89,3.586e-04,
+H32_Hkv8_d128_n32768_b1,sdpa_cudnn,442.94,441.73,445.18,3.538e-04,
+H32_Hkv8_d128_n32768_b1,flashinfer_batch_paged16_tc0,399.33,395.65,424.16,4.120e-04,
+H32_Hkv8_d128_n32768_b1,flashinfer_batch_paged16_tc1,395.65,395.10,397.76,4.041e-04,
+H32_Hkv8_d128_n4096_b8,kvforge_baseline,485.47,484.26,488.64,5.835e-07,splits=1 pack=0 w4 u2 token_major
+H32_Hkv8_d128_n4096_b8,kvforge_pick,405.92,404.13,406.37,4.264e-07,splits=4 pack=1 w8 u2 head_major
+H32_Hkv8_d128_n4096_b8,kvforge_oracle,403.90,402.66,405.06,5.835e-07,splits=1 pack=1 w4 u4 token_major
+H32_Hkv8_d128_n4096_b8,sdpa_default,656.32,653.79,657.70,3.560e-04,
+H32_Hkv8_d128_n4096_b8,sdpa_flash,655.94,654.27,656.58,3.560e-04,
+H32_Hkv8_d128_n4096_b8,sdpa_efficient,2530.72,2528.38,2534.66,3.570e-04,
+H32_Hkv8_d128_n4096_b8,sdpa_cudnn,391.87,389.70,393.70,3.567e-04,
+H32_Hkv8_d128_n4096_b8,flashinfer_batch_paged16_tc0,395.81,393.82,397.28,3.626e-04,
+H32_Hkv8_d128_n4096_b8,flashinfer_batch_paged16_tc1,424.61,422.43,426.53,3.526e-04,
+H32_Hkv8_d128_n65536_b1,kvforge_baseline,2975.74,2973.66,2978.30,1.708e-06,splits=1 pack=0 w4 u2 token_major
+H32_Hkv8_d128_n65536_b1,kvforge_pick,778.94,776.86,779.26,4.506e-07,splits=32 pack=1 w8 u2 head_major
+H32_Hkv8_d128_n65536_b1,kvforge_oracle,771.07,770.53,772.54,4.506e-07,splits=32 pack=1 w8 u4 token_major
+H32_Hkv8_d128_n65536_b1,sdpa_default,839.71,836.10,844.16,3.500e-04,
+H32_Hkv8_d128_n65536_b1,sdpa_flash,840.77,837.57,844.38,3.500e-04,
+H32_Hkv8_d128_n65536_b1,sdpa_efficient,8041.12,8036.45,8045.79,3.843e-04,
+H32_Hkv8_d128_n65536_b1,sdpa_cudnn,817.66,815.62,819.65,3.518e-04,
+H32_Hkv8_d128_n65536_b1,flashinfer_batch_paged16_tc0,772.64,772.22,779.97,4.088e-04,
+H32_Hkv8_d128_n65536_b1,flashinfer_batch_paged16_tc1,774.69,772.45,776.58,4.143e-04,
+H32_Hkv8_d128_n8192_b1,kvforge_baseline,394.43,393.92,394.78,6.774e-07,splits=1 pack=0 w4 u2 token_major
+H32_Hkv8_d128_n8192_b1,kvforge_pick,115.97,115.23,117.73,3.793e-07,splits=32 pack=1 w8 u2 head_major
+H32_Hkv8_d128_n8192_b1,kvforge_oracle,111.39,111.04,111.65,3.793e-07,splits=32 pack=1 w8 u4 token_major
+H32_Hkv8_d128_n8192_b1,sdpa_default,114.66,113.09,115.10,3.474e-04,
+H32_Hkv8_d128_n8192_b1,sdpa_flash,113.34,112.83,114.91,3.474e-04,
+H32_Hkv8_d128_n8192_b1,sdpa_efficient,1022.94,1021.79,1023.90,3.600e-04,
+H32_Hkv8_d128_n8192_b1,sdpa_cudnn,116.96,115.23,117.22,3.519e-04,
+H32_Hkv8_d128_n8192_b1,flashinfer_batch_paged16_tc0,107.14,106.72,108.61,4.131e-04,
+H32_Hkv8_d128_n8192_b1,flashinfer_batch_paged16_tc1,108.96,108.67,109.25,3.935e-04,
+H32_Hkv8_d64_n16384_b1,kvforge_baseline,392.99,392.00,393.28,6.714e-07,splits=1 pack=0 w4 u2 token_major
+H32_Hkv8_d64_n16384_b1,kvforge_pick,121.34,117.89,123.14,3.708e-07,splits=32 pack=1 w8 u2 head_major
+H32_Hkv8_d64_n16384_b1,kvforge_oracle,111.52,111.20,112.90,3.712e-07,splits=32 pack=1 w4 u4 head_major
+H32_Hkv8_d64_n16384_b1,sdpa_default,120.67,119.10,121.12,3.563e-04,
+H32_Hkv8_d64_n16384_b1,sdpa_flash,120.64,119.42,121.09,3.563e-04,
+H32_Hkv8_d64_n16384_b1,sdpa_efficient,1035.26,1033.44,1037.60,3.502e-04,
+H32_Hkv8_d64_n16384_b1,sdpa_cudnn,113.12,112.80,113.28,3.503e-04,
+H32_Hkv8_d64_n16384_b1,flashinfer_batch_paged16_tc0,118.43,115.14,121.02,4.090e-04,
+H32_Hkv8_d64_n16384_b1,flashinfer_batch_paged16_tc1,121.22,120.67,122.82,3.978e-04,
+H64_Hkv8_d128_n8192_b1,kvforge_baseline,406.53,406.11,408.03,6.633e-07,splits=1 pack=0 w4 u2 token_major
+H64_Hkv8_d128_n8192_b1,kvforge_pick,148.06,147.81,148.45,3.661e-07,splits=16 pack=1 w8 u4 head_major
+H64_Hkv8_d128_n8192_b1,kvforge_oracle,145.82,144.19,146.18,3.726e-07,splits=32 pack=1 w4 u4 head_major
+H64_Hkv8_d128_n8192_b1,sdpa_default,114.75,113.15,115.10,3.428e-04,
+H64_Hkv8_d128_n8192_b1,sdpa_flash,114.88,113.31,115.26,3.428e-04,
+H64_Hkv8_d128_n8192_b1,sdpa_efficient,1510.50,1509.57,1511.20,3.510e-04,
+H64_Hkv8_d128_n8192_b1,sdpa_cudnn,117.66,115.33,119.42,3.444e-04,
+H64_Hkv8_d128_n8192_b1,flashinfer_batch_paged16_tc0,111.10,110.62,111.46,4.055e-04,
+H64_Hkv8_d128_n8192_b1,flashinfer_batch_paged16_tc1,112.70,109.28,114.82,3.972e-04,

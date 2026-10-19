@@ -1,0 +1,8 @@
+# Step 2: same Llama-3-8B layer, but the layout and partition are '?':
+# "compiler, choose". No accuracy budget, so only lossless fp16 is allowed.
+decode lossless(H: 32, H_kv: 8, d: 128, n: 32768, batch: 1) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, ?, ?, ?>
+  V: kvcache<n, d, ?, ?, ?>
+  O = decode_attn(Q, K, V, scale = auto, splits = ?, gqa_pack = ?)
+}

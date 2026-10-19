@@ -1,0 +1,11 @@
+# Sweep shape: every field free, lossy formats included, so the sweep times the
+# whole design space the compiler can enumerate for this shape.
+target machine = "machines/rtx5060-laptop.gpu"
+target include_quantized = 1
+
+decode gqa4_8k(H: 32, H_kv: 8, d: 128, n: 8192, batch: 1) {
+  Q: query<H, d, f32>
+  K: kvcache<n, d, ?, ?, ?>
+  V: kvcache<n, d, ?, ?, ?>
+  O = decode_attn(Q, K, V, scale = auto, splits = ?, gqa_pack = ?)
+}
