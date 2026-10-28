@@ -208,3 +208,38 @@ python tools\transfer_report.py results\sweep_rtx5060-laptop.csv results\sweep_r
 ```
 
 `machines\rtx4060-laptop.gpu` is the probe's output plus one line, `resources = resources_sm89.csv`.
+
+## Compressed caches on tensor cores, against FlashInfer fp16 and fp8 (2026-10-29)
+
+New code, separate from the frozen kernels: `runtime/kvf_tc.cuh` (grouped-query decode on
+`mma.m16n8k16`, int8 keys, int8/int4 values, optional fused Hadamard rotation, optional
+software pipeline), `runtime/kvf_lowrank.cuh` (CUDA-core kernel with separate key/value
+formats and low-rank keys). Harness `bench/wsl/lowrank/bench_lr.py`; accuracy study
+`bench/wsl/lowrank/study.py`; summary `tools/lowrank_summary.py`.
+
+**Accuracy** (WikiText-2 perplexity, 40 x 2048 tokens, every layer's cache replaced):
+
+| Format | Qwen3-1.7B | TinyLlama-1.1B | Bytes vs fp16 |
+| --- | --- | --- | --- |
+| fp16 | 15.578 | 8.468 | 1.00 |
+| fp8 e4m3 (FlashInfer) | 15.485 | 8.501 (+0.38%) | 0.50 |
+| K int8:32 + V int4:32 | 15.616 (+0.24%) | 8.479 (+0.14%) | 0.44 |
+| rotated K int8:128 + V int4:64 | 15.579 (+0.00%) | 8.479 (+0.13%) | 0.40 |
+| int4 K and V | 69.6 | - | 0.31 |
+| rank-64 keys, PCA / query-aware | 290.7 / 17.38 | - | 0.75 |
+
+Keys need int8; values take int4. Low-rank (post-RoPE) keys do not pay: 97% of key energy
+at rank 64 still gives perplexity 290 with plain PCA.
+
+**Speed** (RTX 5060 Laptop, AC power, interleaved timing, 0 plans failed the output check):
+
+| | vs FlashInfer fp8 (geomean, range) | vs FlashInfer fp16 |
+| --- | --- | --- |
+| rotated K int8:128 + V int4:64 | 1.19x (1.06 to 1.30) | 2.07x |
+| K int8:32 + V int4:32 | 1.15x (1.04 to 1.26) | 1.99x |
+| fp16 (best KVForge kernel) | - | 0.98x (0.80 to 1.03) |
+
+* Faster than FlashInfer fp8 on all 10 shapes, at fp8's accuracy or better.
+* fp16 still trails on H64/8 (140 vs 112 us): the fp16 path has no tensor-core kernel yet.
+* Plans chosen by a measured search, not yet by the cost model; formats not yet in the compiler.
+* Accuracy: two small models, perplexity only (no long-context retrieval tests).

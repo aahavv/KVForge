@@ -1,0 +1,30 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 2 files:   0%|          | 0/2 [00:00<?, ?it/s]Fetching 2 files:  50%|█████     | 1/2 [06:38<06:38, 398.27s/it]Fetching 2 files: 100%|██████████| 2/2 [26:54<00:00, 879.25s/it]Fetching 2 files: 100%|██████████| 2/2 [26:54<00:00, 807.12s/it]
+Loading weights:   0%|          | 0/311 [00:00<?, ?it/s]Loading weights:   3%|▎         | 9/311 [00:00<00:03, 84.17it/s]Loading weights:   6%|▌         | 18/311 [00:00<00:06, 45.31it/s]Loading weights:  21%|██        | 66/311 [00:00<00:01, 174.04it/s]Loading weights:  29%|██▉       | 91/311 [00:00<00:02, 98.02it/s] Loading weights:  35%|███▌      | 109/311 [00:01<00:02, 79.81it/s]Loading weights:  39%|███▉      | 122/311 [00:01<00:02, 69.80it/s]Loading weights:  43%|████▎     | 133/311 [00:01<00:02, 64.46it/s]Loading weights:  46%|████▌     | 142/311 [00:01<00:03, 54.33it/s]Loading weights:  48%|████▊     | 149/311 [00:02<00:02, 54.15it/s]Loading weights:  50%|█████     | 156/311 [00:02<00:02, 54.91it/s]Loading weights:  52%|█████▏    | 163/311 [00:02<00:02, 55.85it/s]Loading weights:  55%|█████▍    | 170/311 [00:02<00:02, 50.82it/s]Loading weights:  57%|█████▋    | 176/311 [00:02<00:02, 46.45it/s]Loading weights:  58%|█████▊    | 181/311 [00:03<00:04, 30.53it/s]Loading weights:  59%|█████▉    | 185/311 [00:03<00:04, 27.71it/s]Loading weights:  61%|██████    | 189/311 [00:03<00:04, 25.67it/s]Loading weights:  62%|██████▏   | 192/311 [00:03<00:05, 22.82it/s]Loading weights:  63%|██████▎   | 196/311 [00:03<00:04, 23.93it/s]Loading weights:  65%|██████▍   | 201/311 [00:03<00:03, 28.16it/s]Loading weights: 100%|██████████| 311/311 [00:03<00:00, 78.83it/s]
+model Qwen/Qwen3-1.7B layers 28 H 16 Hkv 8 d 128
+Generating test split:   0%|          | 0/4358 [00:00<?, ? examples/s]Generating test split:  23%|██▎       | 1000/4358 [00:00<00:01, 3108.87 examples/s]Generating test split: 100%|██████████| 4358/4358 [00:00<00:00, 12668.14 examples/s]
+Generating train split:   0%|          | 0/36718 [00:00<?, ? examples/s]Generating train split: 100%|██████████| 36718/36718 [00:00<00:00, 398711.89 examples/s]
+Generating validation split:   0%|          | 0/3760 [00:00<?, ? examples/s]Generating validation split: 100%|██████████| 3760/3760 [00:00<00:00, 268732.78 examples/s]
+[transformers] Token indices sequence length is longer than the specified maximum sequence length for this model (2518423 > 131072). Running this sequence through the model will result in indexing errors
+calib windows 16 eval windows 40
+calibrated in 14s
+energy kept (keys):   {'8': 0.7864774129854171, '16': 0.8611709084435664, '32': 0.9258505331844222, '48': 0.9545888003707478, '64': 0.9720195386061278, '96': 0.9920372541678396, '112': 0.9976065198163433}
+energy kept (values): {'8': 0.33817640877579036, '16': 0.4586502258715045, '32': 0.6120415836220998, '48': 0.717853278382947, '64': 0.7997824946324413, '96': 0.9205095779733563, '112': 0.9653045559946207}
+K:f16 V:f16                  ppl 15.5784  attn err mean 0.0000 max-layer 0.0000  bytes 1.000x f16   (19s)
+K:fp8 V:fp8                  ppl 15.4850  attn err mean 0.0695 max-layer 0.1096  bytes 0.500x f16   (19s)
+K:int8 V:int8                ppl 15.5929  attn err mean 0.0194 max-layer 0.0574  bytes 0.562x f16   (19s)
+K:int4 V:int4                ppl 69.6017  attn err mean 0.3354 max-layer 0.9818  bytes 0.312x f16   (19s)
+K:int4 V:int8                ppl 70.0523  attn err mean 0.3269 max-layer 0.9783  bytes 0.438x f16   (19s)
+K:f16+lr32 V:f16             ppl 1615.8476  attn err mean 1.0555 max-layer 3.3376  bytes 0.625x f16   (60s)
+K:f16+lr32q V:f16            ppl 36.6189  attn err mean 0.5007 max-layer 0.6248  bytes 0.625x f16   (20s)
+K:f16+lr48 V:f16             ppl 5310.4146  attn err mean 1.1743 max-layer 3.0241  bytes 0.688x f16   (20s)
+K:f16+lr48q V:f16            ppl 19.7572  attn err mean 0.3865 max-layer 0.4888  bytes 0.688x f16   (22s)
+K:f16+lr64 V:f16             ppl 290.7494  attn err mean 1.1051 max-layer 2.6896  bytes 0.750x f16   (55s)
+K:f16+lr64q V:f16            ppl 17.3824  attn err mean 0.3007 max-layer 0.3938  bytes 0.750x f16   (43s)
+K:f16+lr96 V:f16             ppl 23.3006  attn err mean 0.7467 max-layer 1.9219  bytes 0.875x f16   (30s)
+K:f16+lr96q V:f16            ppl 16.2217  attn err mean 0.1634 max-layer 0.2305  bytes 0.875x f16   (24s)
+K:int8+lr48q V:int8          ppl 19.7571  attn err mean 0.3868 max-layer 0.4892  bytes 0.398x f16   (28s)
+K:int8+lr64q V:int8          ppl 17.3652  attn err mean 0.3018 max-layer 0.3948  bytes 0.422x f16   (24s)
+K:int8+lr96q V:int8          ppl 16.1879  attn err mean 0.1656 max-layer 0.2322  bytes 0.492x f16   (24s)
+K:fp8+lr64q V:fp8            ppl 16.9719  attn err mean 0.3134 max-layer 0.4115  bytes 0.375x f16   (30s)
+wrote /mnt/c/Users/aahav/KVForge/results/lowrank/study_qwen3_1.7b.json
