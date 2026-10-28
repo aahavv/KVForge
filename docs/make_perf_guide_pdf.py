@@ -112,6 +112,32 @@ CHART = os.path.join(ROOT, "results", "lowrank", "speedup_vs_fp8.png")
 fig.savefig(CHART)
 plt.close(fig)
 
+
+# progress on the 32k shape: each method's KVForge time next to FlashInfer fp8 from the same run
+steps = [("1 baseline\nint8, CUDA cores", 337, 269), ("2 byte-permute\nunpack", 286, 269),
+         ("3 batched rescale\n(rank-64 keys)", 256, 267), ("4 int8 K + int4 V\nCUDA cores", 254, 226),
+         ("5 tensor cores\nint8 K + int4 V", 196, 216),
+         ("6 rotation, groups 128\nfinal run", rows["H32_Hkv8_d128_n32768_b1"][BEST], fi8(rows["H32_Hkv8_d128_n32768_b1"]))]
+fig, ax = plt.subplots(figsize=(7.2, 3.2), dpi=200)
+xs = range(len(steps))
+ax.bar([i - 0.19 for i in xs], [k for _, k, _ in steps], width=0.36, color="#0F766E", label="KVForge")
+ax.bar([i + 0.19 for i in xs], [f for _, _, f in steps], width=0.36, color="#94A3B8", label="FlashInfer fp8, same run")
+for i, (_, k, f) in enumerate(steps):
+    ax.text(i - 0.19, k + 4, "%.0f" % k, ha="center", fontsize=7)
+    ax.text(i + 0.19, f + 4, "%.0f" % f, ha="center", fontsize=7, color="#475569")
+ax.set_xticks(list(xs))
+ax.set_xticklabels([n for n, _, _ in steps], fontsize=6.6)
+ax.set_ylabel("time per decode step (us)", fontsize=8)
+ax.set_ylim(0, 380)
+ax.tick_params(axis="y", labelsize=7.5)
+ax.legend(fontsize=7, frameon=False, loc="upper right")
+ax.set_title("KVForge passes FlashInfer fp8 at method 5 (32k context, 32/8 heads)", fontsize=9, loc="left")
+for sp_ in ("top", "right"):
+    ax.spines[sp_].set_visible(False)
+fig.tight_layout()
+fig.savefig(os.path.join(ROOT, "results", "lowrank", "progress_32k.png"))
+plt.close(fig)
+
 # =========================================================================== title
 P("KVForge: performance metrics", "title")
 P("What every number means, how we measured it fairly, and how the compressed-cache kernels came to beat "
@@ -210,30 +236,202 @@ TABLE([
 ], [52, 106, 16])
 
 # =========================================================================== 5
-H1("5. How performance improved, step by step")
-P("The steps below are the 32k-token grouped-query shape (32 query heads, 8 KV heads). Steps 1 to 4 come from "
-  "single-shape runs during development whose memory clocks differed, so compare each KVForge number with the "
-  "FlashInfer number <b>from the same run</b>, not across rows.", "small")
-TABLE([
-    ["Step", "Change", "KVForge", "FlashInfer fp8 (same run)"],
-    ["1", "Starting point: CUDA-core kernel, int8 K and V", "337 us", "269 us"],
-    ["2", "Integer-to-float without the slow I2F instruction (byte-permute into the mantissa of 2^23)", "286 us", "269 us"],
-    ["3", "Softmax rescale once per batch of tokens; int8 zero point as one scalar per lane", "256 us (rank-64 keys)", "267 us"],
-    ["4", "int8 keys + int4 values (fewer bytes) on the same CUDA-core kernel", "254 us", "226 us"],
-    ["5", "Tensor-core kernel: query heads as matrix rows, 16 tokens per mma, keys and values dequantized in registers", "196 us", "216 us"],
-    ["6", "Hadamard rotation fused into the kernel, groups of 128, final interleaved run",
-     "%.0f us" % rows["H32_Hkv8_d128_n32768_b1"][BEST], "%.0f us" % fi8(rows["H32_Hkv8_d128_n32768_b1"])],
-], [11, 95, 30, 38])
-H2("Why step 5 was the big one")
-P("After step 3 the kernel was limited by instructions, not memory: every lane redid the softmax and the head loop, "
-  "about 100 warp instructions per token. Fewer bytes did not help (rank-32 keys were no faster than rank-64). "
-  "The tensor-core version does the head loop in one matrix instruction, about 20 warp instructions per token, so the "
-  "kernel became memory-bound again and fewer bytes turned into less time.")
-B(["<b>Scores:</b> S = Q K<super>T</super> with query heads as the matrix rows and 8 tokens as the columns.",
-   "<b>Output:</b> O<super>T</super> = V<super>T</super> P<super>T</super>, so the probabilities P come out of the score step already in the "
-   "register layout the next instruction needs: no shuffles, no shared memory.",
-   "<b>Loads:</b> the order of the head dimension is permuted (a dot product does not care) so each lane reads 16 contiguous bytes.",
-   "<b>Dequantization:</b> int8 and int4 codes become fp16 with a byte-permute and one fused multiply-add, two numbers per instruction."])
+H1("5. The six methods, in detail", new_page=True)
+P("Each method below is described the same way: <b>what limited speed at that point</b>, <b>how the method works</b> "
+  "(down to the instructions), <b>why it helps</b>, <b>what we measured</b>, and <b>what it cost</b>. All numbers are "
+  "for one shape unless stated: 32 query heads, 8 KV heads, head size 128, 32,768 cached tokens, batch 1 "
+  "(a Llama-3-8B layer at 32k context).")
+BOX("<b>How to read the timings in this chapter.</b> Methods 1 to 5 were measured in single-shape runs while the code "
+    "was being developed. The laptop's memory clock was not the same in every run (9001 or 11871 MHz), so a KVForge "
+    "time is only meaningful next to the FlashInfer time <b>from the same run</b>, which the tables give. Method 6 is "
+    "the final, clean, all-shapes run.", "warn")
+FIG("results/lowrank/progress_32k.png", 168,
+    "KVForge (teal) against FlashInfer fp8 measured in the same run (grey), after each method. "
+    "Lower is better. The gap closes at method 5 and reverses.")
+
+# ---------------------------------------------------------------- method 1
+H2("Method 1 - The starting point: a CUDA-core kernel and the bandwidth floor")
+P("<b>What the kernel does.</b> One thread block handles one KV head (and, with GQA packing, all G = 4 query heads "
+  "that share it) over one chunk of the context. Each token's 128-element row is split over 16 lanes, 8 elements per "
+  "lane, so a warp covers 2 tokens per step. Every lane issues the loads for U tokens before using any of them, to "
+  "keep bytes in flight. Softmax is online: a running maximum m and running sum l, so scores never leave registers.")
+P("<b>How int8 is decoded.</b> A stored element is code x scale + zero, with one (scale, zero) pair per group of "
+  "elements. The score needs no per-element dequantization, because the affine map can be pulled out of the sum:")
+CODE("q . k  =  sum_i q_i (s c_i + z)  =  s (q . c)  +  z (sum_i q_i)\n"
+     "        -> one dot product on the raw codes, then one multiply-add per group")
+P("<b>The floor.</b> int8 K and V with groups of 32 is 128 + 16 = 144 bytes per row per tensor: 75.5 MB for this shape. "
+  "At the 341 GB/s the probe measured, no kernel can finish in under about 221 us.")
+TABLE([["Measured (same run)", "Time", "Note"],
+       ["KVForge int8 (CUDA cores)", "337 us", "52% above the bandwidth floor"],
+       ["FlashInfer fp8 (tensor cores)", "269 us", "67 MB, near its floor"]], [62, 30, 82])
+P("<b>Diagnosis.</b> Cutting the bytes did not cut the time: the same kernel with half-width keys (rank 64) ran almost "
+  "as slowly. When fewer bytes do not help, the kernel is limited by instructions, not memory. So the next methods "
+  "remove instructions.")
+
+# ---------------------------------------------------------------- method 2
+H2("Method 2 - Integer to float without the slow conversion instruction")
+P("<b>The bottleneck.</b> The original unpack turned each 8-bit code into a float with a cast:")
+CODE("x[i] = (float)((u.x >> (8 * i)) & 0xFF);      // shift, mask, I2F")
+P("I2F, the integer-to-float conversion, issues at a quarter of the rate of an FMA on this GPU (16 per clock per SM "
+  "instead of 64). With 256 elements per token (K and V) it was a large share of the work.")
+P("<b>The trick.</b> A float32 with exponent bits 0x4B is 2<super>23</super> = 8,388,608, and its 23 mantissa bits count in "
+  "steps of exactly 1. So if the byte is placed in the low mantissa bits of 0x4B000000, the float's value is "
+  "8,388,608 + code, and one subtraction leaves the code, exactly:")
+CODE("// __byte_perm(a, b, sel) builds a word from any 4 of the 8 bytes of a and b.\n"
+     "// sel = 0x7540 + i:  byte0 <- byte i of u,  byte1 <- 0x00,  byte2 <- 0x00,  byte3 <- 0x4B\n"
+     "x[i] = __uint_as_float(__byte_perm(u.x, 0x4B000000u, 0x7540 + i)) - 8388608.f;")
+P("<b>Why it helps.</b> PRMT (byte permute) and FADD both issue at full rate, and PRMT also replaces the shift and the "
+  "mask. Per 8 elements: 8 PRMT + 8 FADD at full rate, instead of 8 shifts + 8 masks + 8 quarter-rate I2F "
+  "(which cost as much issue time as 32 full-rate instructions).")
+TABLE([["Measured (same run)", "Before", "After"],
+       ["KVForge int8, full width", "337 us", "286 us (-15%)"],
+       ["FlashInfer fp8", "269 us", "269 us"]], [62, 50, 62])
+P("<b>Cost.</b> None: the result is bit-exact (codes are below 2<super>23</super>). The same trick works for 4-bit codes with a "
+  "mask instead of the permute.", "small")
+
+# ---------------------------------------------------------------- method 3
+H2("Method 3 - Rescale once per batch of tokens; the zero point as one number")
+P("<b>The bottleneck.</b> Online softmax rescales the running output every time the maximum may change. The original "
+  "kernel did that per token, per query head, per element, and the int8 zero point added another multiply per element:")
+CODE("// per token, per head j, per element i (8 per lane), int8 values:\n"
+     "m_new = max(m, s);  alpha = exp2(m - m_new);  p = exp2(s - m_new);\n"
+     "acc[j][i] = fma(v[i], p * scale, fma(acc[j][i], alpha, p * zero));   // 2 FMA per element")
+P("<b>The change, part 1: rescale once per U tokens.</b> The U scores loaded together are known before any value is "
+  "used, so the kernel first takes the maximum over all U of them, computes one alpha, and scales the accumulator once. "
+  "Then each token only adds p x v.")
+CODE("mx = max(m, s[0], ..., s[U-1]);   alpha = exp2(m - mx);   acc[j][:] *= alpha;   // once per U tokens\n"
+     "for u: p = exp2(s[u] - mx);  acc[j][i] = fma(v[i], p * scale, acc[j][i]);    // 1 FMA per element")
+P("<b>The change, part 2: the zero point as a scalar.</b> A lane's 8 elements always lie in one quantization group, so "
+  "p x zero is the same number for all 8. It is accumulated once per lane (zacc += p x zero) and added back when "
+  "the lanes are merged, instead of being added to each of the 8 elements.")
+P("<b>Why it helps.</b> Value work per token per head drops from 16 multiply-adds per lane to 8, plus 1 for the zero "
+  "point, plus 8/U for the rescale (U = 4: about 11 instead of 16).")
+TABLE([["Measured (same run)", "Before", "After"],
+       ["KVForge int8, rank-64 keys", "276 us", "256 us (-7%)"],
+       ["KVForge int8, full width", "286 us", "290 us (no gain)"],
+       ["FlashInfer fp8", "267 us", "267 us"]], [62, 50, 62])
+P("<b>What it revealed.</b> The kernel still had a floor near 245 us that did not move with the bytes: rank-32 keys "
+  "(47 MB) ran no faster than rank-64 keys (57 MB), at only 192 GB/s. The kernel used 128 registers per thread, so only "
+  "16 warps fit on each SM, too few to hide the chains of shuffles in the score reduction.")
+P("<b>Tried and rejected: forcing fewer registers.</b> Asking the compiler for at most 85 or 64 registers (to fit 24 or 32 "
+  "warps) made it spill registers to memory (up to 1.7 KB of stack per thread); those kernels ran in 8 to 39 ms, "
+  "30 to 150 times slower. The real fix had to cut work, not registers: method 5.", "small")
+
+# ---------------------------------------------------------------- method 4
+H2("Method 4 - int8 keys, int4 values: spend the bits where the errors hurt")
+P("<b>The idea.</b> Store fewer bytes, but not uniformly. The accuracy study on Qwen3-1.7B showed the two halves of "
+  "the cache react very differently to rounding:")
+TABLE([["Format", "Perplexity", "Bytes per row (K + V)"],
+       ["fp16", "%.2f" % ppl(QR, "f16"), "512"],
+       ["int8 K + int8 V (groups of 32)", "%.2f" % ppl(QR, "int8:32"), "288"],
+       ["int4 K + int4 V", "%.1f (broken)" % ppl(QR, "int4:32"), "160"],
+       ["int8 K + int4 V", "%.2f (+%.2f%%)" % (ppl(QG, "K int8:32 V int4:32"), pct(QG, "K int8:32 V int4:32")), "224"]],
+      [70, 44, 60])
+P("<b>Why keys are sensitive and values are not.</b> A key error delta changes a score by q . delta, and the softmax "
+  "<i>exponentiates</i> scores: a score off by 1 multiplies that token's weight by e = 2.7. Real keys also have a few "
+  "outlier channels much larger than the rest (the reason int4 keys broke the model while int4 values did not); "
+  "with only 16 levels, the step size is set by the outlier and the normal channels lose most of their precision. A value error, by contrast, enters the output "
+  "<i>linearly</i>, weighted by p, and independent rounding errors over thousands of tokens largely cancel.")
+P("<b>Kernel change.</b> The key and value formats became separate template parameters (KF, VF). int4 values load "
+  "4 bytes per lane per token; the 4-bit codes are unpacked with a mask, and the per-group scale and zero work as before.")
+TABLE([["Measured (same run)", "Time"],
+       ["KVForge int8 K + int8 V", "275 us"],
+       ["KVForge int8 K + int4 V", "254 us (-8%; bytes fell 22%)"],
+       ["FlashInfer fp8 (tensor cores)", "226 us"]], [80, 94])
+P("<b>The lesson.</b> 22% fewer bytes bought only 8%, and FlashInfer was still ahead: on CUDA cores the kernel was still "
+  "instruction-bound (method 3's floor). Fewer bytes only pay once the kernel is memory-bound again.")
+
+# ---------------------------------------------------------------- method 5
+H2("Method 5 - Tensor cores for the grouped query heads (the big one)")
+P("<b>The bottleneck.</b> In the CUDA-core kernel every one of the 16 lanes of a token repeated the softmax and looped "
+  "over the 4 query heads: about 100 warp instructions per token. A tensor core does a 16 x 8 x 16 matrix multiply "
+  "(4,096 multiply-adds) in one warp instruction, mma.m16n8k16, with fp16 inputs and fp32 accumulation.")
+P("<b>The scores.</b> For 8 tokens at a time, S = Q K<super>T</super>: the query heads are the 16 rows (rows 0 to G-1 are "
+  "real heads, the rest are zero), the 8 tokens are the columns, and the 128 head dimensions are summed in 8 steps of 16. "
+  "16 tokens = 2 column tiles x 8 steps = 16 mma instructions.")
+P("<b>The output, transposed.</b> O<super>T</super> = V<super>T</super> P<super>T</super>: head dimensions are the rows "
+  "(8 tiles of 16), query heads the 8 columns, tokens the 16-long sum. 16 tokens = 8 mma instructions. The transposition "
+  "is the key: after the score mma, each lane holds head g = lane/4 at tokens 2t and 2t+1 (t = lane mod 4), and that "
+  "is <i>exactly</i> the register layout the second mma needs for P<super>T</super>. The probabilities never go through shared "
+  "memory or shuffles.")
+CODE("// score accumulator after mma #1:  lane (g, t) holds  S[head g][token 2t], S[head g][token 2t+1]\n"
+     "// P^T operand of mma #2 wants:      lane (g, t) holds  P[token 2t][head g], P[token 2t+1][head g]\n"
+     "pb[0] = pack_half2(exp2(s[0][0] - mx), exp2(s[0][1] - mx));   // tokens 2t, 2t+1\n"
+     "pb[1] = pack_half2(exp2(s[1][0] - mx), exp2(s[1][1] - mx));   // tokens 2t+8, 2t+9\n"
+     "mma16816(o[i], vA[0], vA[1], vA[2], vA[3], pb[0], pb[1]);     // O^T tile i += V^T P^T")
+P("<b>Loads made contiguous by permuting dimensions.</b> A dot product does not care about the order of its terms, so "
+  "the head dimension is renumbered so that every lane reads one contiguous 16-byte block:")
+B(["<b>Keys:</b> lane t of a token reads bytes [16t, 16t + 16) of each 64-dimension chunk; mma step s uses dimensions "
+   "64(s/4) + 16t + 4(s mod 4) + {0..3}. The query fragment is built with the same numbering.",
+   "<b>Values:</b> lane g reads dimensions [16g, 16g + 16) of tokens 2t, 2t+1, 2t+8, 2t+9. Output row r of tile i is "
+   "dimension 16g + i (r = g) or 16g + 8 + i (r = g + 8); the merge writes each value back to its real position."])
+P("<b>Dequantization to fp16, two at a time.</b> The fp16 number with bits 0x64XX is 1024 + XX. One byte-permute puts two "
+  "codes into such a pair, one subtraction removes the 1024s, and one fused multiply-add applies scale and zero:")
+CODE("w2 = (__byte_perm(w, 0, 0x4140) & 0x00FF00FF) | 0x64006400;   // (1024 + c0, 1024 + c1)\n"
+     "k2 = __hfma2(__hsub2(w2, 1024.h2), scale.h2, zero.h2);           // (s c0 + z, s c1 + z)\n"
+     "// int4 values: even = w & 0x0F0F0F0F, odd = (w >> 4) & 0x0F0F0F0F, then the same path")
+P("<b>Why it helps.</b> About 20 warp instructions per token instead of about 100, so the kernel is memory-bound again "
+  "and every byte saved now saves time. The 128 x 16 tile of keys is dequantized once and used by all query heads "
+  "inside the mma, instead of once per head per lane.")
+TABLE([["Measured (same run)", "Time", "Achieved bandwidth"],
+       ["KVForge int8 K + int8 V, tensor cores", "240 us", "315 GB/s"],
+       ["KVForge int8 K + int4 V, tensor cores", "196 us", "300 GB/s"],
+       ["KVForge int8 K + int4 V, CUDA cores", "248 us", "237 GB/s"],
+       ["FlashInfer fp8, tensor cores", "216 us", "310 GB/s"]], [80, 30, 64])
+P("<b>Correctness.</b> Output error 3.8e-4 against an fp32 reference from the same stored bytes, the same level as "
+  "FlashInfer's own fp16 kernel (4e-4): fp16 rounding of the mma inputs, nothing more. <b>Cost:</b> rows G to 15 of the "
+  "score tile are padding (75% of the score mma is wasted when G = 4), which is harmless because the tensor cores have "
+  "far more throughput than this kernel needs.", "small")
+
+# ---------------------------------------------------------------- method 6
+H2("Method 6 - Hadamard rotation, larger groups, fused into the kernel; pipelined loads")
+P("<b>The bottleneck.</b> Now memory-bound, every byte counts, and the quantization metadata had become a large share: "
+  "a (scale, zero) pair is 4 bytes per group.")
+TABLE([["Part", "Groups of 32", "Groups of 64 / 128"],
+       ["Key row: 128 int8 codes", "128 + 16 = 144 B (11% metadata)", "128 + 4 = 132 B (group 128)"],
+       ["Value row: 128 int4 codes", "64 + 16 = 80 B (20% metadata)", "64 + 8 = 72 B (group 64)"],
+       ["Total per row", "224 B", "204 B (-9%)"]], [52, 62, 60])
+P("<b>Why bigger groups normally fail.</b> The step size of a group is (max - min) / 255. One outlier channel in a group "
+  "of 128 makes the step large for the other 127 channels. Without rotation, int8:128 keys + int4:64 values cost "
+  "%+.2f%% perplexity on Qwen3." % pct(QG, "K int8:128 V int4:64"))
+P("<b>The rotation.</b> Multiply every query, key and value by H = diag(signs) x Hadamard / sqrt(128), an orthonormal "
+  "matrix of +1 and -1 entries. Because H H<super>T</super> = I, scores are unchanged, and the output is rotated back:")
+CODE("(q H) . (k H) = q H H^T k^T = q . k                    // scores exactly unchanged\n"
+     "sum_t p_t (v_t H) = o H   ->   o = (o H) H^T            // output rotated back after attention")
+P("Each rotated coordinate is a +/- mix of all 128 original ones, so an outlier's energy is spread evenly over the "
+  "whole row; the groups become flat and the step size small. Result: rotated int8:128 + int4:64 is "
+  "%+.2f%% perplexity on Qwen3 and %+.2f%% on TinyLlama (fp8: %+.2f%% and %+.2f%%)."
+  % (pct(QG, "rot K int8:128 V int4:64"), pct(TG, "rot K int8:128 V int4:64"), pct(QG, "fp8 (FlashInfer)"), pct(TG, "fp8 (FlashInfer)")))
+P("<b>Fused, with no matrix in memory.</b> Multiplying by a Hadamard matrix is a fast Walsh-Hadamard transform: 7 "
+  "butterfly stages (log2 128) of additions and subtractions, O(d log d), no 128 x 128 matrix read. The query is rotated "
+  "in the attention kernel's prologue in shared memory (G heads x 128 values), and the output is rotated back inside the "
+  "split-merge kernel, so there are no extra launches. Keys and values are rotated once, when they are written to the cache.")
+CODE("for (h = 1; h < 128; h *= 2)                 // 7 stages, all threads, barrier between stages\n"
+     "  for each pair (j, j + h):  (x[j], x[j+h]) = (x[j] + x[j+h], x[j] - x[j+h]);\n"
+     "q_rot = fwht(q * signs) / sqrt(128);         // prologue      out = fwht(o) * signs / sqrt(128)   // merge")
+P("<b>Pipelined loads.</b> A second loop variant keeps two register sets and issues the next 16-token tile's loads "
+  "before computing the current one, so a warp always has memory requests in flight. It costs registers (187 instead "
+  "of 127, so fewer warps per SM). The plan search picked it in 6 of 30 cases, mostly short contexts with few splits; "
+  "never for the best format. An honest small effect.")
+TABLE([["Final run (same run, all methods)", "Time", "vs FlashInfer fp8"],
+       ["KVForge int8:32 K + int4:32 V", "%.1f us" % rows["H32_Hkv8_d128_n32768_b1"][SIMPLE], "%.2fx" % (fi8(rows["H32_Hkv8_d128_n32768_b1"]) / rows["H32_Hkv8_d128_n32768_b1"][SIMPLE])],
+       ["KVForge rotated int8:128 K + int4:64 V", "%.1f us" % rows["H32_Hkv8_d128_n32768_b1"][BEST], "%.2fx" % (fi8(rows["H32_Hkv8_d128_n32768_b1"]) / rows["H32_Hkv8_d128_n32768_b1"][BEST])],
+       ["FlashInfer fp8", "%.1f us" % fi8(rows["H32_Hkv8_d128_n32768_b1"]), "1.00x"],
+       ["FlashInfer fp16", "%.1f us" % fi16(rows["H32_Hkv8_d128_n32768_b1"]), "%.2fx" % (fi8(rows["H32_Hkv8_d128_n32768_b1"]) / fi16(rows["H32_Hkv8_d128_n32768_b1"]))]],
+      [80, 34, 60])
+P("<b>Cost.</b> The rotation needs splits >= 2 (the merge does the inverse rotation) and adds a few microseconds of "
+  "prologue per block; on the smallest shapes it is a wash (8k context: 62.1 vs 63.8 us without it). In a full model "
+  "the output rotation could instead be folded into the output projection W_O for free.", "small")
+
+H2("The six methods together")
+TABLE([["#", "Method", "Removes", "Effect"],
+       ["1", "Bandwidth floor analysis", "Nothing: finds the target", "Shows 52% headroom; kernel was instruction-bound"],
+       ["2", "Byte-permute int-to-float", "Quarter-rate I2F conversions", "-15% time"],
+       ["3", "Batched rescale, scalar zero", "~1/3 of value-side multiply-adds", "-7% time; exposes a 245 us floor"],
+       ["4", "int8 K + int4 V", "22% of the bytes, at +0.2% perplexity", "-8% on CUDA cores (still instruction-bound)"],
+       ["5", "Tensor cores", "~80% of instructions per token", "Memory-bound: 196 vs 216 us, first win over fp8"],
+       ["6", "Rotation + big groups + pipeline", "9% more bytes, at +0.0% perplexity", "1.19x over fp8 across 10 shapes"]],
+      [7, 46, 60, 61])
 
 # =========================================================================== 6
 H1("6. Final results, all 10 shapes")
