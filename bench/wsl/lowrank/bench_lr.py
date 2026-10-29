@@ -224,6 +224,7 @@ def main():
     ap.add_argument("--only", default="")
     ap.add_argument("--variants", default="")
     ap.add_argument("--out", default=ROOT + "results/lowrank/bench_formats_rtx5060-laptop.csv")
+    ap.add_argument("--dump", default="", help="also write every searched plan's time to this CSV")
     a = ap.parse_args()
 
     plans = {}
@@ -234,6 +235,7 @@ def main():
     kn = Kernels()
     rows = []
     rejected = []
+    dumped = []
     print("torch", torch.__version__, "|", torch.cuda.get_device_name(0), flush=True)
     for shape in sorted(plans):
         if a.only and a.only not in shape:
@@ -322,7 +324,10 @@ def main():
                             if not e < 1e-2:   # every plan is verified, not only the winner
                                 rejected.append("%s splits=%d G=%d U=%d w%d err=%.2e" % (v["name"], splits, G, U, warps, e))
                                 continue
-                            quick.append((C.bench(fn, flush, a.search_reps, warmup=2)[0], (splits, G, U, warps)))
+                            tq = C.bench(fn, flush, a.search_reps, warmup=2)[0]
+                            quick.append((tq, (splits, G, U, warps)))
+                            dumped.append({"shape": shape, "variant": v["name"], "splits": splits, "pack": int(G > 1),
+                                           "U": U, "warps": warps, "t_us": "%.2f" % tq})
             quick.sort()
             fins = [cfg for _, cfg in quick[:6]]
             tt = timed_interleaved([kn.make(v, cfg, t, B, H, Hkv, n, d) for cfg in fins], flush, 9)
@@ -348,6 +353,12 @@ def main():
         del cands, keep, fi, q, K, V, ref
         torch.cuda.empty_cache()
 
+    if a.dump:
+        with open(a.dump, "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=["shape", "variant", "splits", "pack", "U", "warps", "t_us"])
+            w.writeheader()
+            w.writerows(dumped)
+        print("wrote", a.dump, len(dumped), "plans")
     print("\nplans rejected by the output check: %d" % len(rejected))
     for r in rejected:
         print("  " + r)

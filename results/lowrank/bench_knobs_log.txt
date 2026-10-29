@@ -1,0 +1,113 @@
+torch 2.14.1+cu130 | NVIDIA GeForce RTX 5060 Laptop GPU
+
+H16_Hkv16_d64_n8192_b2
+  memory clock 11871 -> 11871 MHz
+  kvforge_f16_pick                       210.3 us  (IQR 209.7..211.8)  err 8.63e-07  frozen kernels, compiler pick
+  flashinfer_batch_paged16_tc0           201.4 us  (IQR 199.7..202.5)  err 2.99e-04  
+  flashinfer_batch_paged16_tc1           249.0 us  (IQR 238.1..253.5)  err 3.56e-04  
+  flashinfer_fp8_paged16_tc0             124.2 us  (IQR 123.6..127.6)  err 3.90e-02  
+  flashinfer_fp8_paged16_tc1             154.8 us  (IQR 154.6..156.6)  err 3.90e-02  
+  kvforge_tc_rot_k8g128v4g64             101.0 us  (IQR 99.3..101.2)  err 3.93e-04  splits=16 pack=0 u0 w4
+  kvforge_k8v4                            99.7 us  (IQR 99.4..101.4)  err 1.72e-06  splits=8 pack=0 u4 w4
+
+H32_Hkv32_d128_n16384_b1
+  flashinfer_single_unavailable      unavailable: Could not find nvcc and default cuda_home='/usr/local/cuda' doesn't exist
+  memory clock 10871 -> 10871 MHz
+  kvforge_f16_pick                       828.4 us  (IQR 826.5..832.5)  err 1.67e-06  frozen kernels, compiler pick
+  flashinfer_batch_paged16_tc0           819.9 us  (IQR 817.6..822.8)  err 2.92e-04  
+  flashinfer_batch_paged16_tc1           866.1 us  (IQR 863.0..867.3)  err 3.54e-04  
+  flashinfer_fp8_paged16_tc0             430.4 us  (IQR 428.7..433.0)  err 3.81e-02  
+  flashinfer_fp8_paged16_tc1             484.2 us  (IQR 482.2..485.7)  err 3.81e-02  
+  kvforge_tc_rot_k8g128v4g64             352.8 us  (IQR 349.1..353.7)  err 3.83e-04  splits=8 pack=0 u0 w4
+  kvforge_k8v4                           380.3 us  (IQR 379.4..384.0)  err 2.41e-06  splits=32 pack=0 u2 w4
+
+H32_Hkv32_d128_n4096_b1
+  flashinfer_single_unavailable      unavailable: Could not find nvcc and default cuda_home='/usr/local/cuda' doesn't exist
+  memory clock 11871 -> 11871 MHz
+  kvforge_f16_pick                       212.3 us  (IQR 211.9..216.1)  err 8.81e-07  frozen kernels, compiler pick
+  flashinfer_batch_paged16_tc0           199.9 us  (IQR 199.0..202.4)  err 2.86e-04  
+  flashinfer_batch_paged16_tc1           215.6 us  (IQR 212.1..220.6)  err 3.39e-04  
+  flashinfer_fp8_paged16_tc0             121.8 us  (IQR 120.1..125.4)  err 3.85e-02  
+  flashinfer_fp8_paged16_tc1             142.0 us  (IQR 132.2..145.1)  err 3.85e-02  
+  kvforge_tc_rot_k8g128v4g64              99.6 us  (IQR 98.8..101.3)  err 3.79e-04  splits=8 pack=0 u1 w8
+  kvforge_k8v4                            99.5 us  (IQR 99.3..100.9)  err 3.79e-06  splits=4 pack=0 u4 w4
+
+H32_Hkv8_d128_n16384_b4
+  memory clock 10871 -> 10871 MHz
+  kvforge_f16_pick                       826.3 us  (IQR 825.9..831.7)  err 4.19e-07  frozen kernels, compiler pick
+  flashinfer_batch_paged16_tc0           823.9 us  (IQR 823.2..826.4)  err 3.65e-04  
+  flashinfer_batch_paged16_tc1           836.3 us  (IQR 830.0..845.7)  err 3.56e-04  
+  flashinfer_fp8_paged16_tc0             561.9 us  (IQR 555.8..563.6)  err 3.85e-02  
+  flashinfer_fp8_paged16_tc1             444.8 us  (IQR 438.5..449.4)  err 3.85e-02  
+  kvforge_tc_rot_k8g128v4g64             361.0 us  (IQR 356.7..362.0)  err 3.99e-04  splits=8 pack=1 u1 w8
+  kvforge_k8v4                           445.1 us  (IQR 444.9..447.1)  err 3.17e-06  splits=16 pack=1 u4 w4
+
+H32_Hkv8_d128_n32768_b1
+  flashinfer_single_unavailable      unavailable: Could not find nvcc and default cuda_home='/usr/local/cuda' doesn't exist
+  memory clock 10871 -> 10871 MHz
+  kvforge_f16_pick                       432.7 us  (IQR 429.2..433.5)  err 4.02e-07  frozen kernels, compiler pick
+  flashinfer_batch_paged16_tc0           423.0 us  (IQR 422.1..424.5)  err 4.12e-04  
+  flashinfer_batch_paged16_tc1           420.7 us  (IQR 420.3..422.2)  err 4.04e-04  
+  flashinfer_fp8_paged16_tc0             272.2 us  (IQR 264.8..275.4)  err 3.82e-02  
+  flashinfer_fp8_paged16_tc1             228.1 us  (IQR 224.8..228.7)  err 3.82e-02  
+  kvforge_tc_rot_k8g128v4g64             197.7 us  (IQR 195.0..199.2)  err 3.86e-04  splits=32 pack=1 u1 w8
+  kvforge_k8v4                           252.2 us  (IQR 249.0..254.7)  err 3.31e-06  splits=32 pack=1 u4 w4
+
+H32_Hkv8_d128_n4096_b8
+  memory clock 10871 -> 10871 MHz
+  kvforge_f16_pick                       433.4 us  (IQR 430.8..435.2)  err 4.26e-07  frozen kernels, compiler pick
+  flashinfer_batch_paged16_tc0           422.2 us  (IQR 420.9..424.4)  err 3.63e-04  
+  flashinfer_batch_paged16_tc1           456.1 us  (IQR 453.7..458.0)  err 3.53e-04  
+  flashinfer_fp8_paged16_tc0             275.4 us  (IQR 274.2..278.7)  err 3.87e-02  
+  flashinfer_fp8_paged16_tc1             250.4 us  (IQR 250.2..254.2)  err 3.87e-02  
+  kvforge_tc_rot_k8g128v4g64             199.9 us  (IQR 199.2..201.6)  err 3.89e-04  splits=4 pack=1 u1 w8
+  kvforge_k8v4                           248.6 us  (IQR 247.2..250.6)  err 1.79e-06  splits=8 pack=1 u4 w4
+
+H32_Hkv8_d128_n65536_b1
+  flashinfer_single_unavailable      unavailable: Could not find nvcc and default cuda_home='/usr/local/cuda' doesn't exist
+  memory clock 9001 -> 9001 MHz
+  kvforge_f16_pick                       998.8 us  (IQR 997.9..1000.3)  err 4.51e-07  frozen kernels, compiler pick
+  flashinfer_batch_paged16_tc0           994.0 us  (IQR 993.9..996.1)  err 4.09e-04  
+  flashinfer_batch_paged16_tc1           996.3 us  (IQR 993.5..998.0)  err 4.14e-04  
+  flashinfer_fp8_paged16_tc0             534.5 us  (IQR 531.3..535.2)  err 3.78e-02  
+  flashinfer_fp8_paged16_tc1             516.9 us  (IQR 516.4..518.5)  err 3.78e-02  
+  kvforge_tc_rot_k8g128v4g64             425.3 us  (IQR 422.8..428.6)  err 3.83e-04  splits=32 pack=1 u1 w8
+  kvforge_k8v4                           528.9 us  (IQR 527.1..529.3)  err 6.50e-06  splits=32 pack=1 u4 w4
+
+H32_Hkv8_d128_n8192_b1
+  flashinfer_single_unavailable      unavailable: Could not find nvcc and default cuda_home='/usr/local/cuda' doesn't exist
+  memory clock 11871 -> 11871 MHz
+  kvforge_f16_pick                       120.0 us  (IQR 118.0..121.8)  err 3.79e-07  frozen kernels, compiler pick
+  flashinfer_batch_paged16_tc0           110.0 us  (IQR 109.5..112.6)  err 4.13e-04  
+  flashinfer_batch_paged16_tc1           111.5 us  (IQR 110.3..113.0)  err 3.93e-04  
+  flashinfer_fp8_paged16_tc0              83.9 us  (IQR 82.8..84.7)  err 3.77e-02  
+  flashinfer_fp8_paged16_tc1              68.4 us  (IQR 67.5..70.5)  err 3.77e-02  
+  kvforge_tc_rot_k8g128v4g64              64.3 us  (IQR 61.9..66.1)  err 3.80e-04  splits=4 pack=1 u1 w8
+  kvforge_k8v4                            85.1 us  (IQR 84.7..86.5)  err 3.43e-06  splits=8 pack=1 u4 w4
+
+H32_Hkv8_d64_n16384_b1
+  flashinfer_single_unavailable      unavailable: Could not find nvcc and default cuda_home='/usr/local/cuda' doesn't exist
+  memory clock 11871 -> 11871 MHz
+  kvforge_f16_pick                       123.9 us  (IQR 122.0..124.4)  err 3.71e-07  frozen kernels, compiler pick
+  flashinfer_batch_paged16_tc0           111.7 us  (IQR 111.2..113.7)  err 4.09e-04  
+  flashinfer_batch_paged16_tc1           113.8 us  (IQR 113.2..115.6)  err 3.98e-04  
+  flashinfer_fp8_paged16_tc0              84.9 us  (IQR 84.7..85.0)  err 4.05e-02  
+  flashinfer_fp8_paged16_tc1              71.2 us  (IQR 69.9..72.6)  err 4.05e-02  
+  kvforge_tc_rot_k8g128v4g64              57.9 us  (IQR 56.5..58.0)  err 4.00e-04  splits=16 pack=1 u1 w4
+  kvforge_k8v4                            85.0 us  (IQR 84.8..85.4)  err 1.75e-06  splits=16 pack=1 u4 w4
+
+H64_Hkv8_d128_n8192_b1
+  flashinfer_single_unavailable      unavailable: Could not find nvcc and default cuda_home='/usr/local/cuda' doesn't exist
+  memory clock 11871 -> 11871 MHz
+  kvforge_f16_pick                       152.3 us  (IQR 150.6..152.7)  err 3.66e-07  frozen kernels, compiler pick
+  flashinfer_batch_paged16_tc0           113.3 us  (IQR 112.8..115.3)  err 4.06e-04  
+  flashinfer_batch_paged16_tc1           113.3 us  (IQR 111.9..114.2)  err 3.97e-04  
+  flashinfer_fp8_paged16_tc0             132.4 us  (IQR 131.3..134.5)  err 3.80e-02  
+  flashinfer_fp8_paged16_tc1              68.6 us  (IQR 68.2..70.2)  err 3.80e-02  
+  kvforge_tc_rot_k8g128v4g64              68.1 us  (IQR 66.0..68.6)  err 3.85e-04  splits=4 pack=1 u1 w8
+  kvforge_k8v4                           131.7 us  (IQR 130.2..132.5)  err 9.33e-07  splits=32 pack=1 u4 w4
+wrote /mnt/c/Users/aahav/KVForge/results/lowrank/knobs_all_plans.csv 912 plans
+
+plans rejected by the output check: 0
+
+wrote /mnt/c/Users/aahav/KVForge/results/lowrank/bench_knobs_best.csv
